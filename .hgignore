@@ -1,0 +1,12 @@
+.*\.pyc
+.*\.egg
+.*\.so
+build/
+dist/
+sphinx-contrib.egg-info/
+TAGS
+\.ropeproject/
+,*~
+
+syntax: glob
+*/distribute-*.tar.gz
