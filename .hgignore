@@ -1,0 +1,15 @@
+.*\.pyc
+.*\.egg
+.*\.so
+build/
+dist/
+sphinx-contrib.egg-info/
+TAGS
+\.ropeproject/
+,*~
+.DS_Store
+spelling/spelling_wordlist.txt
+
+syntax: glob
+*/distribute-*.tar.gz
+.tox/
