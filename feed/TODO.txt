@@ -1,0 +1,16 @@
+=================================================================
+TODO
+=================================================================
+
+- create tests to verify handling of relative *image* links
+- improve and document the toctree-like "latest" directive
+
+  - should this be restricted to titlesonly? - http://sphinx.pocoo.org/latest/markup/toctree.html
+  - support custom date format
+  - why are latest list entires marked as external references?
+  - make sorting by date optional
+  - make displaying date optional
+  - support microformats for date display
+  - rather than ignoring undated articles, include them at the bottom of the list.
+  
+- write rss at the `html-collect-pages` event
