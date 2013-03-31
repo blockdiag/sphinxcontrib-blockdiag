@@ -84,6 +84,7 @@ List of extensions
 - whooshindex: whoosh indexer extension
 - youtube: embed videos from YouTube_
 - zopeext: provide an ``autointerface`` directive for using `Zope interfaces`_.
+- mockautodoc: mock imports.
 
 .. _aafigure: https://launchpad.net/aafigure
 
