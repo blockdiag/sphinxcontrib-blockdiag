@@ -2,6 +2,12 @@
 
 This file describes user-visible changes between the extension versions.
 
+Version 0.2.1 (2012-05-01)
+==========================
+
+* Removed automatic import of `autointerface` to facilitate setup.  New code
+  must now `import sphinxcontrib.zopeext.autointerface` explicitly.
+
 Version 0.2 (2012-07-24)
 ========================
 
