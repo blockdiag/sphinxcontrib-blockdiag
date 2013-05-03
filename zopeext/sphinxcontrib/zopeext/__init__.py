@@ -1,6 +1,3 @@
 __all__ = ['autointerface']
-import autointerface
 
-__version__ = "0.2"
-
-
+__version__ = "0.2.1"
