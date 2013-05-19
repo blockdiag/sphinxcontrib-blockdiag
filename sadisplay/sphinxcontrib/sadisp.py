@@ -120,7 +120,7 @@ def render(self, node):
     all_names = []
 
     for module_name in node['module']:
-        __import__(module_name, globals(), locals(), [], -1)
+        __import__(module_name, globals(), locals())
         module = sys.modules[module_name]
 
         for attr in dir(module):
