@@ -21,7 +21,7 @@ Usage
 
 Add mockautodoc to extensions list::
 
-    extenstion = ['sphinxcontrib.mockautodoc', ]
+    extenstion = ['sphinx.ext.autodoc', 'sphinxcontrib.mockautodoc', ]
 
 The extension add two options to standard automodule:
 

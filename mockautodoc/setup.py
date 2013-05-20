@@ -23,7 +23,7 @@ setup(
     author='Evgeniy Tatarkin',
     author_email='tatarkin.evg@gmail.com',
     description='Sphinx mocking autodoc extension',
-    long_description=open(os.path.join(here, 'README')).read(),
+    long_description=open(os.path.join(here, 'README.rst')).read(),
     zip_safe=False,
     classifiers=[
         'Development Status :: 4 - Beta',

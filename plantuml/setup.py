@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-long_desc = open('README').read()
+long_desc = open('README.rst').read()
 
 requires = ['Sphinx>=1.0']
 
@@ -33,4 +33,5 @@ setup(
     include_package_data=True,
     install_requires=requires,
     namespace_packages=['sphinxcontrib'],
+    use_2to3=True,
 )

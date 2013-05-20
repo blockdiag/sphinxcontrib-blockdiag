@@ -17,14 +17,14 @@ requires = [
 
 setup(
     name='sphinxcontrib-sadisplay',
-    version='0.3.1',
+    version='0.3.2',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-sadisplay',
     license='BSD',
     author='Evgeniy Tatarkin',
     author_email='tatarkin.evg@gmail.com',
     description='Sphinx "sadisplay" extension',
-    long_description=open(os.path.join(here, 'README')).read(),
+    long_description=open(os.path.join(here, 'README.rst')).read(),
     zip_safe=False,
     classifiers=[
         'Development Status :: 4 - Beta',
