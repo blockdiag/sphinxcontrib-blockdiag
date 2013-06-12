@@ -5,7 +5,6 @@ from setuptools import setup, find_packages
 long_desc = '''
 This package contains the adadomain Sphinx extension.
 
-.. add description here ..
 '''
 
 requires = ['Sphinx>=0.6']
