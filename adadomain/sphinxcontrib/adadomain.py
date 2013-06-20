@@ -91,10 +91,7 @@ class AdaObject(ObjectDescription):
             raise ValueError
 
         modname, name, dummy, arglist, returntype, abstract = m.groups()
-        print "DEBUG: modname %s name %s arglist %s" % (modname, name, arglist)
-
         fullname = self._resolve_module_name(signode, modname, name)
-        print "DEBUG: fullname %s" % fullname
 
         if not arglist:
             if self.needs_arglist():
@@ -137,17 +134,13 @@ class AdaObject(ObjectDescription):
 
         
     def _handle_procedure_signature(self, sig, signode):
-        print "DEBUG: _handle_procedure_signature"
         m = ada_proc_sig_re.match(sig)
         if m is None:
             print "m did not match"
             raise ValueError
 
         modname, name, dummy, arglist, abstract = m.groups()
-        print "DEBUG: modname %s name %s arglist %s" % (modname, name, arglist)
-
         fullname = self._resolve_module_name(signode, modname, name)
-        print "DEBUG: fullname: %s" % fullname
 
         if not arglist:
             if self.needs_arglist():
@@ -182,7 +175,6 @@ class AdaObject(ObjectDescription):
         return fullname
 
     def _handle_type_signature(self, sig, signode):
-        print "DEBUG: _handle_type_signature"
         m = ada_type_sig_re.match(sig)
         if m is None:
             print "m did not match"
@@ -202,7 +194,6 @@ class AdaObject(ObjectDescription):
 
 
     def handle_signature(self, sig, signode):
-        print "HANDLE: %s!" % sig
         if sig.startswith('function'):
             return self._handle_function_signature (sig, signode)
         elif sig.startswith('type'):
@@ -222,7 +213,6 @@ class AdaObject(ObjectDescription):
 
 
     def add_target_and_index(self, name, sig, signode):
-        print "DEBUG: add_target_and_index name = %s" % name
         pieces = string.split(name, '.')
         if name not in self.state.document.ids:
             signode['names'].append(name)
@@ -491,7 +481,6 @@ class AdaDomain(Domain):
         Find a Ada object for "name", perhaps using the given module and/or
         classname.
         """
-        print "_find_obj: modname %s name %s" % (modname, name)
         if not name:
             return None, None
         if ":" not in name:
