@@ -35,6 +35,6 @@ def templated(filename):
     fp.close()
 
 templated('setup.py')
-templated('README')
+templated('README.rst')
 
 print 'Created new package in directory', name
