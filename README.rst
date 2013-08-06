@@ -62,6 +62,7 @@ List of extensions
 - lilypond: an extension inserting music scripts from Lilypond_ in PNG format.
 - mockautodoc: mock imports.
 - mscgen: embed mscgen-formatted MSC (Message Sequence Chart)s.
+- napoleon: supports `Google style`_ and `NumPy style`_ docstrings.
 - nicoviceo: embed videos from nicovideo
 - nwdiag: embed network diagrams by using nwdiag_
 - omegat: support tools to collaborate with OmegaT_ (Sphinx 1.1 needed)
@@ -121,6 +122,10 @@ List of extensions
 .. _Google Chart: http://code.google.com/intl/ja/apis/chart/
 
 .. _Google Maps: http://maps.google.com/
+
+.. _Google style: http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
+
+.. _NumPy style: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
 
 .. _hyphenator: http://code.google.com/p/hyphenator/
 
