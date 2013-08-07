@@ -24,6 +24,9 @@ lilypond:
 mscgen:
    Leandro Lucarella <llucax@gmail.com>
 
+napoleon:
+   Rob Ruana <rob@relentlessidiot.com>
+
 paverutils:
    Doug Hellmann <doug.hellmann@gmail.com>
 
@@ -110,4 +113,4 @@ tikz:
    Christoph Reller <christoph.reller@gmail.com>
 
 mockautodoc:
-   Evgeniy Tatarkin <tatarkin.evg@gmail.com> 
+   Evgeniy Tatarkin <tatarkin.evg@gmail.com>

@@ -203,6 +203,19 @@ nicely:
 ``queryparameter``, ``queryparam``, ``qparam``, ``query``
    Description of parameter passed by request query string.
 
+   It optionally can be typed, all the query parameters will have obviously
+   string types though.  But it's useful if there's conventions for it.
+
+   .. versionchanged:: 1.1.9
+
+      It can be typed e.g.:
+
+      .. sourcecode:: rst
+
+         :query string title: the post title
+         :query string body: the post body
+         :query boolean sticky: whether it's sticky or not
+
 ``formparameter``, ``formparam``, ``fparam``, ``form``
    Description of parameter passed by request content body, encoded in
    :mimetype:`application/x-www-form-urlencoded` or
@@ -217,9 +230,9 @@ nicely:
    .. versionchanged:: 1.1.9
 
       It can be typed e.g.:
-      
+
       .. sourcecode:: rst
-         
+
          :jsonparam string title: the post title
          :jsonparam string body: the post body
          :jsonparam boolean sticky: whether it's sticky or not
@@ -447,6 +460,11 @@ will be rendered as:
 
          .. _undoc-members: http://sphinx.pocoo.org/ext/autodoc.html#directive-automodule
 
+   ``blueprints``
+      Only include specified blueprints in generated references.
+
+      .. versionadded:: 1.1.9
+
    ``undoc-blueprints``
       Excludes specified blueprints from generated references.
 
@@ -579,13 +597,18 @@ Changelog
 
 Version 1.1.9
 `````````````
-To be released.
+
+Released on August 8, 2013.
 
 - Now Bottle_ apps can be loaded by :mod:`~sphinxcontrib.autohttp`.
   See :mod:`sphinxcontrib.autohttp.bottle` module.
   [patch_ by Jameel Al-Aziz]
 - Added ``:reqheader:`` and ``:resheader:`` option flags.
 - ``:jsonparameter:`` can be typed.  [:pull:`31` by Chuck Harmston]
+- ``:queryparameter:`` can be types.  [:pull:`37` by Viktor Haag]
+- :rst:dir:`autoflask` and :rst:dir:`autobottle` directives now allow
+  empty ``:endpoints:``, ``:undoc-endpoints:``, and ``:blueprints:``
+  arguments.  [:pull:`33` by Michael Twomey]
 
 .. _patch: https://github.com/jalaziz/sphinxcontrib-httpdomain
 
