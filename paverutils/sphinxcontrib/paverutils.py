@@ -9,6 +9,8 @@ You can also develop your own tasks by calling ``run_sphinx()``
 directly.
 """
 
+from __future__ import print_function
+
 __author__ = 'Doug Hellmann <doug.hellmann@gmail.com>'
 
 from paver.easy import *  # noqa
@@ -317,13 +319,13 @@ def run_script(input_file, script_name,
     }
     try:
         output_text = sh(real_cmd, capture=True, ignore_error=ignore_error)
-    except Exception, err:
-        print '*' * 50
-        print 'ERROR run_script(%s) => %s' % (real_cmd, err)
-        print '*' * 50
+    except Exception as err:
+        print('*' * 50)
+        print('ERROR run_script(%s) => %s' % (real_cmd, err))
+        print('*' * 50)
         output_text = sh(real_cmd, capture=True, ignore_error=True)
-        print output_text
-        print '*' * 50
+        print(output_text)
+        print('*' * 50)
         if not ignore_error:
             raise
     if include_prefix:
