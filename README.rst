@@ -53,6 +53,8 @@ List of extensions
 - exceltable: embed Excel spreadsheets into documents using exceltable_
 - feed: an extension for creating syndication feeds and time-based overviews
   from your site content
+- findanything_: an extension to add Sublime Text 2 like findanything panel
+  to your documentation to find pages, sections and index entries while typing
 - gnuplot: produces images using gnuplot_ language.
 - googleanalytics: track html visitors statistics
 - googlechart: embed charts by using Google Chart_
@@ -79,7 +81,7 @@ List of extensions
   Diagram Editor (sdedit_)
 - seqdiag: embed sequence diagrams by using seqdiag_
 - slide: embed presentation slides on slideshare_ and other sites.
-- swf: embed flash files
+- swf_: embed flash files
 - sword: an extension inserting Bible verses from Sword_.
 - tikz: draw pictures with the `TikZ/PGF LaTeX package`_.
 - traclinks: create TracLinks_ to a Trac_ instance from within Sphinx
@@ -140,6 +142,10 @@ List of extensions
 .. _slideshare: http://www.slideshare.net/
 
 .. _TikZ/PGF LaTeX package: http://sourceforge.net/projects/pgf/
+
+.. _swf: http://bitbucket.org/klorenz/sphinxcontrib-swf
+
+.. _findanything: http://bitbucket.org/klorenz/sphinxcontrib-findanything
 
 For contributors
 ================
