@@ -11,8 +11,9 @@ This extension ships with jQuery_ and following jQuery plugins:
 
 See :doc:`license` for licenses.
 
-.. _jQuery Cookie: href
-.. _jQuery Cursor: href
-.. _jQuery FuzzyFind: href
-.. _jQuery Keymap: href
-.. _jQuery SimpleModal: href
+.. _jQuery Cookie: http://github.com/carhartl/jquery-cookie
+.. _jQuery Cursor: http://bitbucket.com/klorenz/jquery-cursor
+.. _jQuery FuzzyFind: http://bitbucket.com/klorenz/jquery-fuzzyfind
+.. _jQuery Keymap: http://bitbucket.com/klorenz/jquery-keymap
+.. _jQuery SimpleModal: http://www.ericmmartin.com/projects/simplemodal/
+.. _jQuery: http://jquery.com/
