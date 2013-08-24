@@ -100,7 +100,7 @@ class ShockWaveFlash(Directive):
             self.options['allowfullscreen'] = env.config.swf_allowfullscreen_default
 
         for opt in self.options:
-            typ = self.option_spec[opt]
+            typ = self.option_spec.get(opt, None)
             if typ is bool_option:
                 if self.options[opt].lower() in ('yes', 'true', '1'):
                     self.options[opt] = True
@@ -123,7 +123,7 @@ class ShockWaveFlash(Directive):
         return [ swf(rawsource=self.block_text, **self.options) ]
 
 def html_visit_swf(self, node):
-    result = '<div>'
+    result = ''
 
     width  = node['width']
     height = node['height']
@@ -137,6 +137,11 @@ def html_visit_swf(self, node):
             params += '<param name="%s" value="%s">\n' % (k, self.attval(val))
 
     classes = list(node['classes'])
+
+    if len(classes):
+        result += '<div class="sphinxcontrib-swf %s">'%' '.join(classes)
+    else:
+        result += '<div class="sphinxcontrib-swf">'
 
     # zoom-to-fit onload event of object, for now only for non-IE browsers
     zoom_to_fit = ''

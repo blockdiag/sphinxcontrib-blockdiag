@@ -47,3 +47,36 @@ Welcome to SWF Sphinx Extension's documentation!
 .. confval:: swf_height_default
 
    Default is "300"
+
+
+Caveats
+=======
+
+Substitutions do not work (yet)
+-------------------------------
+
+Following code is not working::
+
+    +----------+-----------+
+    |  |Itot|  |  |IpPol|  |
+    +----------+-----------+
+
+    .. |Itot| swf:: Itot.swf
+    .. |IpPol| swf:: IpPol.swf
+
+For getting two videos next to each other use following workaround::
+
+    .. raw:: html
+
+        <style>
+            .two-swf .sphinxcontrib-swf {
+                display: inline-block;
+            }
+        </style>
+
+    .. container:: two-swf
+
+        .. swf:: Itot.swf
+
+        .. swf:: IpPol.swf
+
