@@ -20,7 +20,7 @@ requires = ['Sphinx>=0.6']
 
 setup(
     name='sphinxcontrib-swf',
-    version='0.2',
+    version='0.3',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-swf',
     license='BSD',

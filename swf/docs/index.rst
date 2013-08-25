@@ -49,34 +49,11 @@ Welcome to SWF Sphinx Extension's documentation!
    Default is "300"
 
 
-Caveats
+Changes
 =======
 
-Substitutions do not work (yet)
--------------------------------
-
-Following code is not working::
-
-    +----------+-----------+
-    |  |Itot|  |  |IpPol|  |
-    +----------+-----------+
-
-    .. |Itot| swf:: Itot.swf
-    .. |IpPol| swf:: IpPol.swf
-
-For getting two videos next to each other use following workaround::
-
-    .. raw:: html
-
-        <style>
-            .two-swf .sphinxcontrib-swf {
-                display: inline-block;
-            }
-        </style>
-
-    .. container:: two-swf
-
-        .. swf:: Itot.swf
-
-        .. swf:: IpPol.swf
-
+=== ======================================================================
+0.3 make docutils swf node inline, such that substitutions work
+--- ----------------------------------------------------------------------
+0.2 add class "sphinxcontrib-swf" to container element
+=== ======================================================================

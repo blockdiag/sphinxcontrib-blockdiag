@@ -1,6 +1,16 @@
+'''
+    sphinxcontrib.swf
+    ~~~~~~~~~~~~~~~~~
+
+    This module provides :rst:directive:`swf`, which you can use to embed
+    flash objects into your documentation.
+    
+'''
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 import os, sys, re, shutil
+
+__version__ = '0.3'
 
 def bool_option(argument):
     return directives.choice(argument, 
@@ -37,7 +47,7 @@ def aspectratio_option(argument):
     return directives.choice(argument, ('portrait', 'landscape'))
 
 
-class swf(nodes.General, nodes.Element): pass
+class swf(nodes.General, nodes.Inline, nodes.Element): pass
 
 # http://helpx.adobe.com/flash/kb/flash-object-embed-tag-attributes.html
 FLASH_PARAMS = {
@@ -139,9 +149,9 @@ def html_visit_swf(self, node):
     classes = list(node['classes'])
 
     if len(classes):
-        result += '<div class="sphinxcontrib-swf %s">'%' '.join(classes)
+        result += '<span class="sphinxcontrib-swf %s">'%' '.join(classes)
     else:
-        result += '<div class="sphinxcontrib-swf">'
+        result += '<span class="sphinxcontrib-swf">'
 
     # zoom-to-fit onload event of object, for now only for non-IE browsers
     zoom_to_fit = ''
@@ -170,15 +180,15 @@ def html_visit_swf(self, node):
     
     result += '''
                 <!--<![endif]-->
-                <div>
-                    <p><a href="http://www.adobe.com/go/getflashplayer"><img 
-                     src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player"></a></p>
-                </div>
+                <span>
+                    <a href="http://www.adobe.com/go/getflashplayer"><img 
+                     src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player"></a>
+                </span>
                 <!--[if !IE]>-->
            </object>
            <!--<![endif]-->
            </object>
-           </div>'''
+           </span>'''
 
     self.body.append(result)
 
