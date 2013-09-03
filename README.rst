@@ -76,6 +76,7 @@ List of extensions
 - rawfiles: copy raw files, like a CNAME.
 - requirements: declare requirements wherever you need (e.g. in test
   docstrings), mark statuses and collect them in a single list
+- restbuilder: a builder for reST (reStructuredText) files.
 - rubydomain: an extension for Ruby support (Sphinx 1.0 needed)
 - sadisplay: display SqlAlchemy model sadisplay_
 - sdedit: an extension inserting sequence diagram by using Quick Sequence.
@@ -145,9 +146,12 @@ List of extensions
 .. _TikZ/PGF LaTeX package: http://sourceforge.net/projects/pgf/
 
 .. _MATLAB: http://www.mathworks.com/products/matlab/
+
 .. _swf: http://bitbucket.org/klorenz/sphinxcontrib-swf
 
 .. _findanything: http://bitbucket.org/klorenz/sphinxcontrib-findanything
+
+.. _restbuilder: https://pypi.python.org/pypi/sphinxcontrib-restbuilder
 
 For contributors
 ================
