@@ -3,12 +3,11 @@
 from setuptools import setup, find_packages
 
 long_desc = '''
-This package contains the lassodomain Sphinx extension.
-
-.. add description here ..
+This package contains the lassodomain Sphinx extension, which adds
+support for the Lasso language to Sphinx.
 '''
 
-requires = ['Sphinx>=0.6']
+requires = ['Sphinx>=1.0']
 
 setup(
     name='sphinxcontrib-lassodomain',
@@ -17,8 +16,8 @@ setup(
     download_url='http://pypi.python.org/pypi/sphinxcontrib-lassodomain',
     license='BSD',
     author='Eric Knibbe',
-    author_email='eric@lassosoft.com',
-    description='Sphinx "lassodomain" extension',
+    author_email='eric at lassosoft dotcom',
+    description='Lasso domain for Sphinx',
     long_description=long_desc,
     zip_safe=False,
     classifiers=[
