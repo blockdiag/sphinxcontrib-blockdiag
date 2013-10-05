@@ -42,11 +42,11 @@ And insert rack structure diagrams::
 This module needs nwdiag_.
 '''
 
-requires = ['nwdiag>=0.9.0', 'Sphinx>=0.6', 'setuptools']
+requires = ['nwdiag>=1.0.0', 'Sphinx>=0.6', 'setuptools']
 
 setup(
     name='sphinxcontrib-nwdiag',
-    version='0.6.1',
+    version='0.7.0',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-nwdiag',
     license='BSD',
