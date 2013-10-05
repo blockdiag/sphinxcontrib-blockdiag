@@ -35,7 +35,7 @@ class Nwdiag(nwdiag.utils.rst.directives.NwdiagDirective):
     def run(self):
         try:
             return super(Nwdiag, self).run()
-        except nwdiag.core.parser.ParseException, e:
+        except nwdiag.core.parser.ParseException as e:
             if self.content:
                 msg = '[%s] ParseError: %s\n%s' % (self.name, e, "\n".join(self.content))
             else:
@@ -63,7 +63,7 @@ def get_image_filename(self, code, format, options, prefix='nwdiag'):
                   'colud not output PDF format; Install reportlab\n'
             raise NwdiagError(msg)
 
-    hashkey = code.encode('utf-8') + str(options)
+    hashkey = (code + str(options)).encode('utf-8')
     fname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), format.lower())
     if hasattr(self.builder, 'imgpath'):
         # HTML
@@ -100,7 +100,7 @@ def get_fontmap(self):
 
     try:
         fontpath = self.builder.config.nwdiag_fontpath
-        if isinstance(fontpath, (str, unicode)):
+        if isinstance(fontpath, nwdiag.utils.compat.string_types):
             fontpath = [fontpath]
 
         if fontpath:
@@ -131,7 +131,7 @@ def create_nwdiag(self, code, format, filename, options, prefix='nwdiag'):
         antialias = self.builder.config.nwdiag_antialias
         draw = nwdiag.core.drawer.DiagramDraw(format, diagram, filename,
                                               fontmap=fontmap, antialias=antialias)
-    except Exception, e:
+    except Exception as e:
         if self.builder.config.nwdiag_debug:
             traceback.print_exc()
 
@@ -201,7 +201,7 @@ def render_dot_html(self, node, code, options, prefix='nwdiag',
                "(check your font settings)")
         self.builder.warn(msg)
         raise nodes.SkipNode
-    except NwdiagError, exc:
+    except NwdiagError as exc:
         self.builder.warn('dot code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
@@ -238,7 +238,7 @@ def render_dot_latex(self, node, code, options, prefix='nwdiag'):
             image.draw()
             image.save()
 
-    except NwdiagError, exc:
+    except NwdiagError as exc:
         self.builder.warn('dot code %r: ' % code + str(exc))
         raise nodes.SkipNode
 

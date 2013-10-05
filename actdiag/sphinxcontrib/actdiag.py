@@ -26,6 +26,7 @@ from sphinx.errors import SphinxError
 from sphinx.util.osutil import ensuredir
 
 import actdiag_sphinxhelper as actdiag
+u = actdiag.utils.compat.u
 
 
 class ActdiagError(SphinxError):
@@ -36,7 +37,7 @@ class Actdiag(actdiag.utils.rst.directives.ActdiagDirective):
     def run(self):
         try:
             return super(Actdiag, self).run()
-        except actdiag.core.parser.ParseException, e:
+        except actdiag.core.parser.ParseException as e:
             if self.content:
                 msg = '[%s] ParseError: %s\n%s' % (self.name, e, "\n".join(self.content))
             else:
@@ -64,7 +65,7 @@ def get_image_filename(self, code, format, options, prefix='actdiag'):
                   'colud not output PDF format; Install reportlab\n'
             raise ActdiagError(msg)
 
-    hashkey = code.encode('utf-8') + str(options)
+    hashkey = (code + str(options)).encode('utf-8')
     fname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), format.lower())
     if hasattr(self.builder, 'imgpath'):
         # HTML
@@ -101,7 +102,7 @@ def get_fontmap(self):
 
     try:
         fontpath = self.builder.config.actdiag_fontpath
-        if isinstance(fontpath, (str, unicode)):
+        if isinstance(fontpath, actdiag.utils.compat.string_types):
             fontpath = [fontpath]
 
         if fontpath:
@@ -131,7 +132,7 @@ def get_anchor(self, refid, fromdocname):
 def resolve_reference(self, href, options):
     if href is None:
         return
-    pattern = re.compile(u"^:ref:`(.+?)`", re.UNICODE)
+    pattern = re.compile(u("^:ref:`(.+?)`"), re.UNICODE)
     matched = pattern.search(href)
     if matched:
         return get_anchor(self, matched.group(1), options['current_docname'])
@@ -159,7 +160,7 @@ def create_actdiag(self, code, format, filename, options, prefix='actdiag'):
         antialias = self.builder.config.actdiag_antialias
         draw = actdiag.core.drawer.DiagramDraw(format, diagram, filename,
                                                fontmap=fontmap, antialias=antialias)
-    except Exception, e:
+    except Exception as e:
         if self.builder.config.actdiag_debug:
             traceback.print_exc()
 
@@ -257,7 +258,7 @@ def render_dot_html(self, node, code, options, prefix='actdiag',
                "(check your font settings)")
         self.builder.warn(msg)
         raise nodes.SkipNode
-    except ActdiagError, exc:
+    except ActdiagError as exc:
         self.builder.warn('dot code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
@@ -294,7 +295,7 @@ def render_dot_latex(self, node, code, options, prefix='actdiag'):
             image.draw()
             image.save()
 
-    except ActdiagError, exc:
+    except ActdiagError as exc:
         self.builder.warn('dot code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
