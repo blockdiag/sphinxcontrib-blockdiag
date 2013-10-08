@@ -29,12 +29,16 @@ Installation
 
 After installing ``lassodomain.py`` in ``site-packages/sphinxcontrib``, add the
 ``sphinxcontrib.lassodomain`` extension to the ``extensions`` list in your
-Sphinx configuration file (``conf.py``)::
+Sphinx configuration file (``conf.py``):
+
+.. code-block:: python
 
    extensions = ['sphinxcontrib.lassodomain']
 
 Also, if your project is primarily Lasso, you'll want to define the primary
-domain as well::
+domain as well:
+
+.. code-block:: python
 
    primary_domain = 'ls'
 
@@ -158,3 +162,7 @@ definitions of each element::
 
 Use :ls:meth:`array->exchange` to swap the position of two array elements.
 
+A set of empty parentheses ``()`` will be appended, if absent, to method
+cross-references by default. This can be reversed by setting
+``add_function_parentheses = False`` in your project's ``conf.py``, causing them
+to be removed if present.
