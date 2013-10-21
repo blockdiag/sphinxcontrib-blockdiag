@@ -28,11 +28,11 @@ Following code is sample::
 This module needs actdiag_.
 '''
 
-requires = ['actdiag>=0.4.0', 'Sphinx>=0.6', 'setuptools']
+requires = ['actdiag>=0.5.0', 'Sphinx>=0.6', 'setuptools']
 
 setup(
     name='sphinxcontrib-actdiag',
-    version='0.5.1',
+    version='0.6.0',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-actdiag',
     license='BSD',
@@ -49,6 +49,10 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
         'Topic :: Documentation',
         'Topic :: Utilities',
     ],

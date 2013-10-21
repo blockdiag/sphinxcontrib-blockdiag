@@ -10,40 +10,32 @@
     :license: BSDL.
 """
 
-import posixpath
+import io
 import os
-import codecs
+import posixpath
 import traceback
+from collections import namedtuple
 try:
     from hashlib import sha1 as sha
 except ImportError:
     from sha import sha
 
 from docutils import nodes
-from docutils.parsers.rst import directives
-
 from sphinx.errors import SphinxError
-from sphinx.util.osutil import ensuredir, ENOENT, EPIPE
-from sphinx.util.compat import Directive
+from sphinx.util.osutil import ensuredir
 
-from seqdiag_sphinxhelper import command, parser, builder, drawer
-from seqdiag_sphinxhelper import collections, FontMap
-from seqdiag_sphinxhelper import seqdiag, SeqdiagDirective
-namedtuple = collections.namedtuple
-
-import blockdiag_sphinxhelper
-detectfont = blockdiag_sphinxhelper.command.detectfont
+import seqdiag_sphinxhelper as seqdiag
 
 
 class SeqdiagError(SphinxError):
     category = 'Seqdiag error'
 
 
-class Seqdiag(SeqdiagDirective):
+class Seqdiag(seqdiag.utils.rst.directives.SeqdiagDirective):
     def run(self):
         try:
             return super(Seqdiag, self).run()
-        except parser.ParseException, e:
+        except seqdiag.core.parser.ParseException as e:
             if self.content:
                 msg = '[%s] ParseError: %s\n%s' % (self.name, e, "\n".join(self.content))
             else:
@@ -71,7 +63,7 @@ def get_image_filename(self, code, format, options, prefix='seqdiag'):
                   'colud not output PDF format; Install reportlab\n'
             raise SeqdiagError(msg)
 
-    hashkey = code.encode('utf-8') + str(options)
+    hashkey = (code + str(options)).encode('utf-8')
     fname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), format.lower())
     if hasattr(self.builder, 'imgpath'):
         # HTML
@@ -91,6 +83,8 @@ def get_image_filename(self, code, format, options, prefix='seqdiag'):
 
 
 def get_fontmap(self):
+    FontMap = seqdiag.utils.fontmap.FontMap
+
     try:
         fontmappath = self.builder.config.seqdiag_fontmap
         fontmap = FontMap(fontmappath)
@@ -106,12 +100,12 @@ def get_fontmap(self):
 
     try:
         fontpath = self.builder.config.seqdiag_fontpath
-        if isinstance(fontpath, (str, unicode)):
+        if isinstance(fontpath, seqdiag.utils.compat.string_types):
             fontpath = [fontpath]
 
         if fontpath:
             config = namedtuple('Config', 'font')(fontpath)
-            _fontpath = detectfont(config)
+            _fontpath = seqdiag.utils.bootstrap.detectfont(config)
             fontmap.set_default_font(_fontpath)
     except:
         attrname = '_seqdiag_fontpath_warned'
@@ -131,13 +125,13 @@ def create_seqdiag(self, code, format, filename, options, prefix='seqdiag'):
     draw = None
     fontmap = get_fontmap(self)
     try:
-        tree = parser.parse_string(code)
-        screen = builder.ScreenNodeBuilder.build(tree)
+        tree = seqdiag.core.parser.parse_string(code)
+        diagram = seqdiag.core.builder.ScreenNodeBuilder.build(tree)
 
         antialias = self.builder.config.seqdiag_antialias
-        draw = drawer.DiagramDraw(format, screen, filename,
-                                  fontmap=fontmap, antialias=antialias)
-    except Exception, e:
+        draw = seqdiag.core.drawer.DiagramDraw(format, diagram, filename,
+                                               fontmap=fontmap, antialias=antialias)
+    except Exception as e:
         if self.builder.config.seqdiag_debug:
             traceback.print_exc()
 
@@ -153,7 +147,7 @@ def make_svgtag(self, image, relfn, trelfn, outfn,
     alt="%s" width="%s" height="%s">%s
     </svg>"""
 
-    code = open(outfn, 'r').read().decode('utf-8')
+    code = io.open(outfn, 'r', encoding='utf-8-sig').read()
 
     return (svgtag_format %
             (alt, image_size[0], image_size[1], code))
@@ -202,12 +196,12 @@ def render_dot_html(self, node, code, options, prefix='seqdiag',
                 image.filename = toutfn
                 image.save(thumb_size)
 
-    except UnicodeEncodeError, e:
+    except UnicodeEncodeError:
         msg = ("seqdiag error: UnicodeEncodeError caught "
                "(check your font settings)")
         self.builder.warn(msg)
         raise nodes.SkipNode
-    except SeqdiagError, exc:
+    except SeqdiagError as exc:
         self.builder.warn('dot code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
@@ -244,7 +238,7 @@ def render_dot_latex(self, node, code, options, prefix='seqdiag'):
             image.draw()
             image.save()
 
-    except SeqdiagError, exc:
+    except SeqdiagError as exc:
         self.builder.warn('dot code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
@@ -261,7 +255,7 @@ def on_doctree_resolved(self, doctree, docname):
     if self.builder.name in ('gettext', 'singlehtml', 'html', 'latex', 'epub'):
         return
 
-    for node in doctree.traverse(seqdiag):
+    for node in doctree.traverse(seqdiag.utils.rst.nodes.seqdiag):
         code = node['code']
         prefix = 'seqdiag'
         format = 'PNG'
@@ -279,7 +273,7 @@ def on_doctree_resolved(self, doctree, docname):
 
 
 def setup(app):
-    app.add_node(seqdiag,
+    app.add_node(seqdiag.utils.rst.nodes.seqdiag,
                  html=(html_visit_seqdiag, None),
                  latex=(latex_visit_seqdiag, None))
     app.add_directive('seqdiag', Seqdiag)

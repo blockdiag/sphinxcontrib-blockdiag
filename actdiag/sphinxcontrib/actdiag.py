@@ -10,41 +10,34 @@
     :license: BSDL.
 """
 
-import posixpath
-import re
+import io
 import os
-import codecs
+import re
+import posixpath
 import traceback
+from collections import namedtuple
 try:
     from hashlib import sha1 as sha
 except ImportError:
     from sha import sha
 
 from docutils import nodes
-from docutils.parsers.rst import directives
-
 from sphinx.errors import SphinxError
-from sphinx.util.osutil import ensuredir, ENOENT, EPIPE
-from sphinx.util.compat import Directive
+from sphinx.util.osutil import ensuredir
 
-from actdiag_sphinxhelper import command, parser, builder, drawer
-from actdiag_sphinxhelper import collections, FontMap
-from actdiag_sphinxhelper import actdiag, ActdiagDirective
-namedtuple = collections.namedtuple
-
-import blockdiag_sphinxhelper
-detectfont = blockdiag_sphinxhelper.command.detectfont
+import actdiag_sphinxhelper as actdiag
+u = actdiag.utils.compat.u
 
 
 class ActdiagError(SphinxError):
     category = 'Actdiag error'
 
 
-class Actdiag(ActdiagDirective):
+class Actdiag(actdiag.utils.rst.directives.ActdiagDirective):
     def run(self):
         try:
             return super(Actdiag, self).run()
-        except parser.ParseException, e:
+        except actdiag.core.parser.ParseException as e:
             if self.content:
                 msg = '[%s] ParseError: %s\n%s' % (self.name, e, "\n".join(self.content))
             else:
@@ -72,7 +65,7 @@ def get_image_filename(self, code, format, options, prefix='actdiag'):
                   'colud not output PDF format; Install reportlab\n'
             raise ActdiagError(msg)
 
-    hashkey = code.encode('utf-8') + str(options)
+    hashkey = (code + str(options)).encode('utf-8')
     fname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), format.lower())
     if hasattr(self.builder, 'imgpath'):
         # HTML
@@ -92,6 +85,8 @@ def get_image_filename(self, code, format, options, prefix='actdiag'):
 
 
 def get_fontmap(self):
+    FontMap = actdiag.utils.fontmap.FontMap
+
     try:
         fontmappath = self.builder.config.actdiag_fontmap
         fontmap = FontMap(fontmappath)
@@ -107,12 +102,12 @@ def get_fontmap(self):
 
     try:
         fontpath = self.builder.config.actdiag_fontpath
-        if isinstance(fontpath, (str, unicode)):
+        if isinstance(fontpath, actdiag.utils.compat.string_types):
             fontpath = [fontpath]
 
         if fontpath:
             config = namedtuple('Config', 'font')(fontpath)
-            _fontpath = detectfont(config)
+            _fontpath = actdiag.utils.bootstrap.detectfont(config)
             fontmap.set_default_font(_fontpath)
     except:
         attrname = '_actdiag_fontpath_warned'
@@ -137,7 +132,7 @@ def get_anchor(self, refid, fromdocname):
 def resolve_reference(self, href, options):
     if href is None:
         return
-    pattern = re.compile(u"^:ref:`(.+?)`", re.UNICODE)
+    pattern = re.compile(u("^:ref:`(.+?)`"), re.UNICODE)
     matched = pattern.search(href)
     if matched:
         return get_anchor(self, matched.group(1), options['current_docname'])
@@ -152,20 +147,20 @@ def create_actdiag(self, code, format, filename, options, prefix='actdiag'):
     draw = None
     fontmap = get_fontmap(self)
     try:
-        tree = parser.parse_string(code)
-        screen = builder.ScreenNodeBuilder.build(tree)
+        tree = actdiag.core.parser.parse_string(code)
+        diagram = actdiag.core.builder.ScreenNodeBuilder.build(tree)
 
-        for lane in screen.lanes:
+        for lane in diagram.lanes:
             if lane.href:
                 lane.href = resolve_reference(self, lane.href, options)
-        for node in screen.traverse_nodes():
+        for node in diagram.traverse_nodes():
             if node.href:
                 node.href = resolve_reference(self, node.href, options)
 
         antialias = self.builder.config.actdiag_antialias
-        draw = drawer.DiagramDraw(format, screen, filename,
-                                  fontmap=fontmap, antialias=antialias)
-    except Exception, e:
+        draw = actdiag.core.drawer.DiagramDraw(format, diagram, filename,
+                                               fontmap=fontmap, antialias=antialias)
+    except Exception as e:
         if self.builder.config.actdiag_debug:
             traceback.print_exc()
 
@@ -181,7 +176,7 @@ def make_svgtag(self, image, relfn, trelfn, outfn,
     alt="%s" width="%s" height="%s">%s
     </svg>"""
 
-    code = open(outfn, 'r').read().decode('utf-8')
+    code = io.open(outfn, 'r', encoding='utf-8-sig').read()
 
     return (svgtag_format %
             (alt, image_size[0], image_size[1], code))
@@ -258,12 +253,12 @@ def render_dot_html(self, node, code, options, prefix='actdiag',
                 image.filename = toutfn
                 image.save(thumb_size)
 
-    except UnicodeEncodeError, e:
+    except UnicodeEncodeError:
         msg = ("actdiag error: UnicodeEncodeError caught "
                "(check your font settings)")
         self.builder.warn(msg)
         raise nodes.SkipNode
-    except ActdiagError, exc:
+    except ActdiagError as exc:
         self.builder.warn('dot code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
@@ -300,7 +295,7 @@ def render_dot_latex(self, node, code, options, prefix='actdiag'):
             image.draw()
             image.save()
 
-    except ActdiagError, exc:
+    except ActdiagError as exc:
         self.builder.warn('dot code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
@@ -317,7 +312,7 @@ def on_doctree_resolved(self, doctree, docname):
     if self.builder.name in ('gettext', 'singlehtml', 'html', 'latex', 'epub'):
         return
 
-    for node in doctree.traverse(actdiag):
+    for node in doctree.traverse(actdiag.utils.rst.nodes.actdiag):
         code = node['code']
         prefix = 'actdiag'
         format = 'PNG'
@@ -335,7 +330,7 @@ def on_doctree_resolved(self, doctree, docname):
 
 
 def setup(app):
-    app.add_node(actdiag,
+    app.add_node(actdiag.utils.rst.nodes.actdiag,
                  html=(html_visit_actdiag, None),
                  latex=(latex_visit_actdiag, None))
     app.add_directive('actdiag', Actdiag)

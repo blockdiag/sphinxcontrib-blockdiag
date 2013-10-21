@@ -37,11 +37,11 @@ List of extensions
 .. Note that this will be viewed using the bitbucket web interface ..
 .. which supports a subset, but not the full sphinx markup. ..
 
-- aafig: render embeded ASCII art as nice images using aafigure_.
+- aafig: render embedded ASCII art as nice images using aafigure_.
 - actdiag: embed activity diagrams by using actdiag_
 - adadomain: an extension for Ada support (Sphinx 1.0 needed)
 - ansi: parse ANSI color sequences inside documents
-- autorun: Execute code in a runblock directive.
+- autorun: Execute code in a ``runblock`` directive.
 - blockdiag: embed block diagrams by using blockdiag_
 - cheeseshop: easily link to PyPI packages
 - clearquest: create tables from ClearQuest_ queries.
@@ -53,14 +53,15 @@ List of extensions
 - exceltable: embed Excel spreadsheets into documents using exceltable_
 - feed: an extension for creating syndication feeds and time-based overviews
   from your site content
-- findanything_: an extension to add Sublime Text 2 like findanything panel
+- findanything_: an extension to add Sublime Text 2-like findanything panels
   to your documentation to find pages, sections and index entries while typing
 - gnuplot: produces images using gnuplot_ language.
-- googleanalytics: track html visitors statistics
-- googlechart: embed charts by using Google Chart_
-- googlemaps: embed maps by using Google Maps_
+- googleanalytics: track web visitor statistics by using `Google Analytics`_
+- googlechart: embed charts by using `Google Chart`_
+- googlemaps: embed maps by using `Google Maps`_
 - httpdomain: a domain for documenting RESTful HTTP APIs.
 - hyphenator: client-side hyphenation of HTML using hyphenator_
+- lassodomain: a domain for documenting Lasso_ source code
 - lilypond: an extension inserting music scripts from Lilypond_ in PNG format.
 - matlabdomain: document MATLAB_ code.
 - mockautodoc: mock imports.
@@ -79,7 +80,7 @@ List of extensions
 - restbuilder: a builder for reST (reStructuredText) files.
 - rubydomain: an extension for Ruby support (Sphinx 1.0 needed)
 - sadisplay: display SqlAlchemy model sadisplay_
-- sdedit: an extension inserting sequence diagram by using Quick Sequence.
+- sdedit: an extension inserting sequence diagram by using Quick Sequence
   Diagram Editor (sdedit_)
 - seqdiag: embed sequence diagrams by using seqdiag_
 - slide: embed presentation slides on slideshare_ and other sites.
@@ -123,7 +124,9 @@ List of extensions
 
 .. _nwdiag: http://blockdiag.com/
 
-.. _Google Chart: http://code.google.com/intl/ja/apis/chart/
+.. _Google Analytics: http://www.google.com/analytics/
+
+.. _Google Chart: https://developers.google.com/chart/
 
 .. _Google Maps: http://maps.google.com/
 
@@ -152,6 +155,8 @@ List of extensions
 .. _findanything: http://bitbucket.org/klorenz/sphinxcontrib-findanything
 
 .. _restbuilder: https://pypi.python.org/pypi/sphinxcontrib-restbuilder
+
+.. _Lasso: http://www.lassosoft.com/
 
 For contributors
 ================
