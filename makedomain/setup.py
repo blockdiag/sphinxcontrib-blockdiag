@@ -13,7 +13,7 @@ requires = ['Sphinx>=0.6', 'sphinxcontrib-domaintools>=0.1']
 
 setup(
     name='sphinxcontrib-makedomain',
-    version='0.1',
+    version='0.1.1',
     url='http://bitbucket.org/klorenz/sphinxcontrib-makedomain',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-makedomain',
     license='BSD',

@@ -12,12 +12,12 @@
     :license: BSD, see LICENSE for details.
 """
 
-__version__ = "0.1"
+__version__ = "0.1.1"
 # for this module's sphinx doc 
 release = __version__
 version = release.rsplit('.', 1)[0]
 
-from domaintools import custom_domain
+from sphinxcontrib.domaintools import custom_domain
 import re
 
 def setup(app):
