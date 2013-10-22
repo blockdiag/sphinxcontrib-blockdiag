@@ -44,7 +44,7 @@ class SlideDirective(Directive):
 
 
 def get_slide_options(url):
-    if re.match('https://docs.google.com/presentation/pub', url):
+    if re.match('https://docs.google.com/presentation/(pub\?|d/)', url):
         return get_slide_options_for_googledocs(url)
     elif re.match('http://www.slideshare.net/', url):
         return get_slide_options_for_slideshare(url)
@@ -58,7 +58,10 @@ def get_slide_options(url):
 def get_slide_options_for_googledocs(url):
     options = {}
     options['type'] = 'googledocs'
-    options['embed_url'] = re.sub('/pub\?', '/embed?', url)
+    if re.search('/presentation/pub', url):
+        options['embed_url'] = re.sub('/pub\?', '/embed?', url)
+    elif re.search('/presentation/d/', url):
+        options['embed_url'] = re.sub('/edit.*', '', re.sub('/d/', '/embed?id=', url))
 
     content = urllib2.urlopen(url).read()
     matched = re.search('<title>(.*?)</title>', content)
