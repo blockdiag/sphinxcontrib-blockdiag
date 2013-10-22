@@ -7,13 +7,9 @@
     :license: BSD, see LICENSE for details.
 """
 
-import os
 import re
 import urllib2
-
-from docutils import nodes, utils
-from docutils.parsers.rst import directives
-
+from docutils import nodes
 from sphinx.util.compat import Directive
 
 
