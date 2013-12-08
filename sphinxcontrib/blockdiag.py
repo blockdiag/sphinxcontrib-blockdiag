@@ -59,7 +59,7 @@ def get_image_filename(self, code, format, options, prefix='blockdiag'):
 
     if format.upper() == 'PDF':
         try:
-            import reportlab
+            __import__("reportlab")
         except ImportError:
             msg = 'blockdiag error:\n' + \
                   'colud not output PDF format; Install reportlab\n'
