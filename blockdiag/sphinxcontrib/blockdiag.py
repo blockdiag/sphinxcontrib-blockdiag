@@ -62,7 +62,7 @@ def get_image_filename(self, code, format, options, prefix='blockdiag'):
             __import__("reportlab")
         except ImportError:
             msg = 'blockdiag error:\n' + \
-                  'colud not output PDF format; Install reportlab\n'
+                  'could not output PDF format; Install reportlab\n'
             raise BlockdiagError(msg)
 
     hashkey = (code + str(options)).encode('utf-8')
@@ -147,6 +147,7 @@ def create_blockdiag(self, code, format, filename, options, prefix):
     draw = None
     fontmap = get_fontmap(self)
     try:
+        print blockdiag.core.parser.parse_string
         tree = blockdiag.core.parser.parse_string(code)
         diagram = blockdiag.core.builder.ScreenNodeBuilder.build(tree)
         for node in diagram.traverse_nodes():
