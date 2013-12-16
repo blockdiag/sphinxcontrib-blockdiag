@@ -11,7 +11,7 @@ requires = ['Sphinx>=1.0']
 
 setup(
     name='sphinxcontrib-lassodomain',
-    version='0.1',
+    version='0.2',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-lassodomain',
     license='BSD',

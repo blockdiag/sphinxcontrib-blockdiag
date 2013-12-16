@@ -9,12 +9,11 @@ Contents
 
    reference
 
-* :ref:`genindex`
-* :ref:`search`
+*  :ref:`genindex`
+*  :ref:`search`
 
 
 ChangeLog
 =========
 
 .. include:: ../CHANGES.rst
-

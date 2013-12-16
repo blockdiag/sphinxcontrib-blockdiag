@@ -12,16 +12,16 @@ This extension adds support for the Lasso language to Sphinx.
 
 The following objects are supported:
 
-* Unbound method
-* Trait
+*  Unbound method
+*  Trait
 
-  * Require
-  * Provide
+   *  Require
+   *  Provide
 
-* Type/Thread
+*  Type/Thread
 
-  * Member method
-  * Provide
+   *  Member method
+   *  Provide
 
 
 Installation
