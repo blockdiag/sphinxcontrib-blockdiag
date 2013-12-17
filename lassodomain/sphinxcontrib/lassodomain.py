@@ -23,11 +23,11 @@ from sphinx.util.nodes import make_refnode
 
 
 class SingleTypedField(Field):
-    """
-    A doc field that occurs once and can contain type information.  It does not
-    have an argument.  The type can be linked using the given *typerolename*.
-    Used in this domain to describe return values and types, which are specified
-    with :return: and :rtype: and are combined into a single field list item.
+    """A doc field that occurs once and can contain type information.  It does
+    not have an argument.  The type can be linked using the given
+    *typerolename*.  Used in this domain to describe return values and types,
+    which are specified with :return: and :rtype: and are combined into a single
+    field list item.
 
     Example::
 
@@ -113,7 +113,7 @@ class LSObject(ObjectDescription):
     def handle_signature(self, sig, signode):
         """Transform a Lasso signature into RST nodes.
         """
-        sig = sig.strip()
+        sig = sig.strip().replace('  ', ' ').replace(' ::', '::').replace(':: ', '::')
         if '(' in sig:
             if ')::' in sig:
                 sig, returntype = sig.rsplit('::', 1)
