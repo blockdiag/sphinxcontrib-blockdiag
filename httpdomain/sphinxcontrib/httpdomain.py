@@ -44,7 +44,7 @@ class DocRef(object):
         location of the RFC which defines some HTTP method.
 
         """
-        return '{}#{}{}'.format(self.base_url, self.anchor, self.section)
+        return '{0}#{1}{2}'.format(self.base_url, self.anchor, self.section)
 
 
 #: The URL of the HTTP/1.1 RFC which defines the HTTP methods OPTIONS, GET,
@@ -144,7 +144,7 @@ class HTTPResource(ObjectDescription):
         TypedField('parameter', label='Parameters',
                    names=('param', 'parameter', 'arg', 'argument'),
                    typerolename='obj', typenames=('paramtype', 'type')),
-        TypedField('jsonparameter', label='Json Parameters',
+        TypedField('jsonparameter', label='JSON Parameters',
                    names=('jsonparameter', 'jsonparam', 'json'),
                    typerolename='obj', typenames=('jsonparamtype', 'jsontype')),
         TypedField('queryparameter', label='Query Parameters',
@@ -407,7 +407,7 @@ class HTTPDomain(Domain):
 
     def clear_doc(self, docname):
         for typ, routes in self.routes.items():
-            for path, info in routes.items():
+            for path, info in list(routes.items()):
                 if info[0] == docname:
                     del routes[path]
 

@@ -45,9 +45,11 @@ List of extensions
 - blockdiag: embed block diagrams by using blockdiag_
 - cheeseshop: easily link to PyPI packages
 - clearquest: create tables from ClearQuest_ queries.
+- cmakedomain_: a domain for CMake_
 - coffeedomain: a domain for (auto)documenting CoffeeScript source code.
 - context: a builder for ConTeXt.
 - doxylink: Link to external Doxygen-generated HTML documentation
+- domaintools_: A tool for easy domain creation.
 - email: obfuscate email addresses
 - erlangdomain: an extension for Erlang support (Sphinx 1.0 needed)
 - exceltable: embed Excel spreadsheets into documents using exceltable_
@@ -61,8 +63,10 @@ List of extensions
 - googlemaps: embed maps by using `Google Maps`_
 - httpdomain: a domain for documenting RESTful HTTP APIs.
 - hyphenator: client-side hyphenation of HTML using hyphenator_
+- inlinesyntaxhighlight_: inline syntax highlighting
 - lassodomain: a domain for documenting Lasso_ source code
 - lilypond: an extension inserting music scripts from Lilypond_ in PNG format.
+- makedomain_: a domain for `GNU Make`_
 - matlabdomain: document MATLAB_ code.
 - mockautodoc: mock imports.
 - mscgen: embed mscgen-formatted MSC (Message Sequence Chart)s.
@@ -74,6 +78,7 @@ List of extensions
 - paverutils: an alternate integration of Sphinx with Paver_.
 - phpdomain: an extension for PHP support
 - plantuml: embed UML diagram by using PlantUML_
+- py_directive: Execute python code in a ``py`` directive and return a math node.
 - rawfiles: copy raw files, like a CNAME.
 - requirements: declare requirements wherever you need (e.g. in test
   docstrings), mark statuses and collect them in a single list
@@ -127,7 +132,6 @@ List of extensions
 .. _Google Analytics: http://www.google.com/analytics/
 
 .. _Google Chart: https://developers.google.com/chart/
-
 .. _Google Maps: http://maps.google.com/
 
 .. _Google style: http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
@@ -153,6 +157,18 @@ List of extensions
 .. _swf: http://bitbucket.org/klorenz/sphinxcontrib-swf
 
 .. _findanything: http://bitbucket.org/klorenz/sphinxcontrib-findanything
+
+.. _cmakedomain: http://bitbucket.org/klorenz/sphinxcontrib-cmakedomain
+
+.. _GNU Make: http://www.gnu.org/software/make/
+
+.. _makedomain: http://bitbucket.org/klorenz/sphinxcontrib-makedomain
+
+.. _inlinesyntaxhighlight: http://sphinxcontrib-inlinesyntaxhighlight.readthedocs.org
+
+.. _CMake: http://cmake.org
+
+.. _domaintools: http://bitbucket.org/klorenz/sphinxcontrib-domaintools
 
 .. _restbuilder: https://pypi.python.org/pypi/sphinxcontrib-restbuilder
 

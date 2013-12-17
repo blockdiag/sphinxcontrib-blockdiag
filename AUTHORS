@@ -115,8 +115,23 @@ swf:
 findanything:
    Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
 
+domaintools:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+makedomain:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+cmakedomain:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+inlinesyntaxhighlight:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
 restbuilder:
    Freek Dijkstra <software@macfreek.nl>
 
 lassodomain:
    Eric Knibbe <eric@lassosoft.com>
+
+py_directive:
+   Bill Purcell <william@whpiv.net>

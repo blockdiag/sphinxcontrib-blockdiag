@@ -135,7 +135,7 @@ def resolve_reference(self, href, options):
     pattern = re.compile(u("^:ref:`(.+?)`"), re.UNICODE)
     matched = pattern.search(href)
     if matched:
-        return get_anchor(self, matched.group(1), options['current_docname'])
+        return get_anchor(self, matched.group(1), options.get('current_docname', ''))
     else:
         return href
 
@@ -324,7 +324,7 @@ def on_doctree_resolved(self, doctree, docname):
             image.draw()
             image.save()
 
-        candidates = {'image/png': outfn}
+        candidates = {'image/png': relfn}
         image = nodes.image(uri=outfn, candidates=candidates)
         node.parent.replace(node, image)
 
