@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013 Rob Ruana
+# Copyright 2014 Rob Ruana
 # Licensed under the BSD License, see LICENSE file for details.
 
 """Classes for docstring parsing and formatting."""
 
 import re
+import sys
 from sphinxcontrib.napoleon.iterators import modify_iter
+
+
+if sys.version_info[0] >= 3:
+    basestring = str
+    xrange = range
 
 
 _directive_regex = re.compile(r'\.\. \S+::')
@@ -132,7 +138,10 @@ class GoogleDocstring(object):
             UTF-8 encoded version of the docstring.
 
         """
-        return unicode(self).encode('utf-8')
+        if sys.version_info[0] >= 3:
+            return self.__unicode__()
+        else:
+            return self.__unicode__().encode('utf8')
 
     def __unicode__(self):
         """Return the parsed docstring in reStructuredText format.
@@ -143,7 +152,7 @@ class GoogleDocstring(object):
             Unicode version of the docstring.
 
         """
-        return '\n'.join(self.lines())
+        return u'\n'.join(self.lines())
 
     def lines(self):
         """Return the parsed lines of the docstring in reStructuredText format.

@@ -1,35 +1,38 @@
-napoleon Package
-================
+sphinxcontrib.napoleon package
+==============================
 
-:mod:`napoleon` Package
------------------------
+Submodules
+----------
 
-.. automodule:: sphinxcontrib.napoleon
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`docstring` Module
------------------------
+sphinxcontrib.napoleon.docstring module
+---------------------------------------
 
 .. automodule:: sphinxcontrib.napoleon.docstring
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`iterators` Module
------------------------
+sphinxcontrib.napoleon.iterators module
+---------------------------------------
 
 .. automodule:: sphinxcontrib.napoleon.iterators
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pavertasks` Module
-------------------------
+sphinxcontrib.napoleon.pavertasks module
+----------------------------------------
 
 .. automodule:: sphinxcontrib.napoleon.pavertasks
     :members:
     :undoc-members:
     :show-inheritance:
 
+
+Module contents
+---------------
+
+.. automodule:: sphinxcontrib.napoleon
+    :members:
+    :undoc-members:
+    :show-inheritance:

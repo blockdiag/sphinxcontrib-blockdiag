@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013 Rob Ruana
+# Copyright 2014 Rob Ruana
 # Licensed under the BSD License, see LICENSE file for details.
 
 """Tests for :mod:`sphinxcontrib.napoleon.iterators` module."""
 
+import sys
 from sphinxcontrib.napoleon.iterators import peek_iter, modify_iter
 from unittest import TestCase
+
+
+if sys.version_info[0] >= 3:
+    u = lambda s: s
+else:
+    u = lambda s: unicode(s.replace(r'\\', r'\\\\'), "unicode_escape")
 
 
 class BaseIteratorsTest(TestCase):
@@ -46,7 +53,7 @@ class PeekIterTest(BaseIteratorsTest):
         self.assertRaises(TypeError, peek_iter, a, sentinel)
 
         def get_next():
-            return a.next()
+            return next(a)
         it = peek_iter(get_next, sentinel)
         self.assertEqual(it.sentinel, sentinel)
         self.assertNext(it, '1', is_last=False)
@@ -303,7 +310,7 @@ class ModifyIterTest(BaseIteratorsTest):
         sentinel = 'DONE'
 
         def get_next():
-            return a.next()
+            return next(a)
         it = modify_iter(get_next, sentinel, int)
         expected = [1, 2, 3]
         self.assertEqual(expected, [i for i in it])
@@ -313,7 +320,7 @@ class ModifyIterTest(BaseIteratorsTest):
         sentinel = 4
 
         def get_next():
-            return a.next()
+            return next(a)
         it = modify_iter(get_next, sentinel, modifier=str)
         expected = ['1', '2', '3']
         self.assertEqual(expected, [i for i in it])
@@ -334,7 +341,7 @@ class ModifyIterTest(BaseIteratorsTest):
         self.assertEqual(expected, [i for i in it])
 
     def test_modifier_rstrip_unicode(self):
-        a = [u'', u'  ', u'  a  ', u'b  ', u'  c', u'  ', u'']
+        a = [u(''), u('  '), u('  a  '), u('b  '), u('  c'), u('  '), u('')]
         it = modify_iter(a, modifier=lambda s: s.rstrip())
-        expected = [u'', u'', u'  a', u'b', u'  c', u'', u'']
+        expected = [u(''), u(''), u('  a'), u('b'), u('  c'), u(''), u('')]
         self.assertEqual(expected, [i for i in it])
