@@ -1,0 +1,22 @@
+.*\.pyc
+.*\.egg
+.*\.so
+build/
+dist/
+env/
+sphinx-contrib.egg-info/
+TAGS
+\.ropeproject/
+\.idea/
+,*~
+.DS_Store
+spelling/spelling_wordlist.txt
+sqltable/docs/sampledata.db
+
+syntax: glob
+*/distribute-*.tar.gz
+.tox/
+.coverage/
+.*.swp
+sphinxcontrib_matlabdomain.sublime-project
+sphinxcontrib_matlabdomain.sublime-workspace
