@@ -147,7 +147,6 @@ def create_blockdiag(self, code, format, filename, options, prefix):
     draw = None
     fontmap = get_fontmap(self)
     try:
-        print blockdiag.core.parser.parse_string
         tree = blockdiag.core.parser.parse_string(code)
         diagram = blockdiag.core.builder.ScreenNodeBuilder.build(tree)
         for node in diagram.traverse_nodes():
