@@ -67,7 +67,7 @@ List of extensions
 - lassodomain: a domain for documenting Lasso_ source code
 - lilypond: an extension inserting music scripts from Lilypond_ in PNG format.
 - makedomain_: a domain for `GNU Make`_
-- matlabdomain: document MATLAB_ code.
+- matlabdomain_: document MATLAB_ and `GNU Octave`_ code.
 - mockautodoc: mock imports.
 - mscgen: embed mscgen-formatted MSC (Message Sequence Chart)s.
 - napoleon: supports `Google style`_ and `NumPy style`_ docstrings.
@@ -153,6 +153,10 @@ List of extensions
 .. _TikZ/PGF LaTeX package: http://sourceforge.net/projects/pgf/
 
 .. _MATLAB: http://www.mathworks.com/products/matlab/
+
+.. _GNU Octave: https://www.gnu.org/software/octave/
+
+.. _matlabdomain: https://pypi.python.org/pypi/sphinxcontrib-matlabdomain/
 
 .. _swf: http://bitbucket.org/klorenz/sphinxcontrib-swf
 
