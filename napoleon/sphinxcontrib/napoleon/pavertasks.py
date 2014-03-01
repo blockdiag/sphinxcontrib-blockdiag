@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013 Rob Ruana
+# Copyright 2014 Rob Ruana
 # Licensed under the BSD License, see LICENSE file for details.
 
 """Sphinx related paver tasks.
@@ -72,6 +72,7 @@ html
 """
 
 import os
+import sys
 from paver.easy import BuildFailure, needs, task
 
 
@@ -81,6 +82,10 @@ try:
     has_sphinx = True
 except ImportError:
     has_sphinx = False
+
+
+if sys.version_info[0] >= 3:
+    basestring = str
 
 
 @task

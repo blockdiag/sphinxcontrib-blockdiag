@@ -3,8 +3,8 @@ Lasso Domain Reference
 ======================
 
 The Lasso domain (name **ls**) provides directives for each language element, as
-well as corresponding roles for cross-referencing. See the `domain docs`_ for
-more details on syntax.
+well as corresponding roles for cross-referencing. See the docs for `Sphinx
+domains`_ for more details on syntax.
 
 
 Directives
@@ -20,15 +20,15 @@ The following directives act as containers for Lasso method descriptions.
 
 Options for container directives include:
 
-* ``import``, ``imports``:
-  A comma-separated list of imported trait names.
-* ``parent``, ``super``:
-  The ``parent`` statement can appear in types and threads, which denotes
-  another type that the current is derived from.
+*  ``import``, ``imports``:
+   A comma-separated list of imported trait names.
+*  ``parent``, ``super``:
+   The ``parent`` statement can appear in types and threads, which denotes
+   the type that the current type is derived from.
 
 These directives describe types of methods, and can be associated with their
 container element either by being nested within the body of one of the above
-directives, or by having a fully-qualified name using the ``container->member``
+directives, or by having a fully-qualified name using the ``container->name``
 syntax.
 
 .. directive:: .. ls:method:: name(signature)
@@ -53,15 +53,15 @@ syntax.
 
 Each directive with a signature supports the following options:
 
-* ``param``, ``parameter``:
-  Descriptions of parameters, with or without a type constraint. For an unnamed
-  rest parameter, use ``...`` for the name.
-* ``ptype``, ``paramtype``, ``type``:
-  Description of parameter type if more than one word is required.
-* ``return``, ``returns``:
-  Description of the value returned.
-* ``rtype``, ``returntype``:
-  Further description of the return value type.
+*  ``param``, ``parameter``:
+   Descriptions of parameters, with or without a type constraint. For an unnamed
+   rest parameter, use ``...`` for the name.
+*  ``ptype``, ``paramtype``, ``type``:
+   Description of parameter type if more than one word is required.
+*  ``return``, ``returns``:
+   Description of the value returned.
+*  ``rtype``, ``returntype``:
+   Further description of the return value type.
 
 Every directive also supports the ``see`` or ``url`` option for adding links to
 more info, and the ``author`` or ``authors`` option for adding an attribution.
@@ -72,8 +72,8 @@ indicate which parameters are optional either using square brackets or ``=?``,
 including the default value if desired.
 
 
-Quick example
--------------
+Quick examples
+--------------
 
 ::
 
@@ -129,7 +129,7 @@ Cross-referencing is done with the same role syntax as other domains, except
 that member tag syntax is used to associate member methods with their containing
 type, trait, or thread using the arrow operator ``->``, such as
 ``:meth:`bytes->getrange```. All other syntax follows what's described in the
-`domain docs`_.
+docs for `Sphinx domains`_.
 
 Use the following roles to link to definitions of each element:
 
@@ -162,12 +162,10 @@ with the :ls:meth:`pair->first` and :ls:meth:`~pair->second` methods.
 More Info
 =========
 
-* Sphinx `domain docs`_
-* `LassoGuide`_
-* `LassoSoft`_
+*  Docs for `Sphinx domains`_
+*  `LassoGuide`_
+*  `LassoSoft`_
 
-
-.. _`domain docs`: http://sphinx-doc.org/domains.html
+.. _`Sphinx domains`: http://sphinx-doc.org/domains.html
 .. _`LassoGuide`: http://www.lassoguide.com/
 .. _`LassoSoft`: http://www.lassosoft.com/
-

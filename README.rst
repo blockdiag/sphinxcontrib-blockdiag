@@ -61,13 +61,13 @@ List of extensions
 - googleanalytics: track web visitor statistics by using `Google Analytics`_
 - googlechart: embed charts by using `Google Chart`_
 - googlemaps: embed maps by using `Google Maps`_
-- httpdomain: a domain for documenting RESTful HTTP APIs.
+- httpdomain_: a domain for documenting RESTful HTTP APIs.
 - hyphenator: client-side hyphenation of HTML using hyphenator_
 - inlinesyntaxhighlight_: inline syntax highlighting
 - lassodomain: a domain for documenting Lasso_ source code
 - lilypond: an extension inserting music scripts from Lilypond_ in PNG format.
 - makedomain_: a domain for `GNU Make`_
-- matlabdomain: document MATLAB_ code.
+- matlabdomain_: document MATLAB_ and `GNU Octave`_ code.
 - mockautodoc: mock imports.
 - mscgen: embed mscgen-formatted MSC (Message Sequence Chart)s.
 - napoleon: supports `Google style`_ and `NumPy style`_ docstrings.
@@ -78,6 +78,7 @@ List of extensions
 - paverutils: an alternate integration of Sphinx with Paver_.
 - phpdomain: an extension for PHP support
 - plantuml: embed UML diagram by using PlantUML_
+- py_directive: Execute python code in a ``py`` directive and return a math node.
 - rawfiles: copy raw files, like a CNAME.
 - requirements: declare requirements wherever you need (e.g. in test
   docstrings), mark statuses and collect them in a single list
@@ -153,6 +154,10 @@ List of extensions
 
 .. _MATLAB: http://www.mathworks.com/products/matlab/
 
+.. _GNU Octave: https://www.gnu.org/software/octave/
+
+.. _matlabdomain: https://pypi.python.org/pypi/sphinxcontrib-matlabdomain/
+
 .. _swf: http://bitbucket.org/klorenz/sphinxcontrib-swf
 
 .. _findanything: http://bitbucket.org/klorenz/sphinxcontrib-findanything
@@ -172,6 +177,8 @@ List of extensions
 .. _restbuilder: https://pypi.python.org/pypi/sphinxcontrib-restbuilder
 
 .. _Lasso: http://www.lassosoft.com/
+
+.. _httpdomain: https://pythonhosted.org/sphinxcontrib-httpdomain/
 
 For contributors
 ================

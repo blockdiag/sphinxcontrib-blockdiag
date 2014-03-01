@@ -12,16 +12,16 @@ This extension adds support for the Lasso language to Sphinx.
 
 The following objects are supported:
 
-* Unbound method
-* Trait
+*  Unbound method
+*  Trait
 
-  * Require
-  * Provide
+   *  Require
+   *  Provide
 
-* Type/Thread
+*  Type/Thread
 
-  * Member method
-  * Provide
+   *  Member method
+   *  Provide
 
 
 Installation
@@ -159,10 +159,13 @@ From elsewhere in the document you can use the following syntax to link to
 definitions of each element::
 
    Use :ls:meth:`array->exchange` to swap the position of two array elements.
+   To check if a tag exists, use :ls:meth:`tag_exists(string)`.
 
 Use :ls:meth:`array->exchange` to swap the position of two array elements.
+To check if a tag exists, use :ls:meth:`tag_exists(string)`.
 
 A set of empty parentheses ``()`` will be appended, if absent, to method
 cross-references by default. This can be reversed by setting
 ``add_function_parentheses = False`` in your project's ``conf.py``, causing them
-to be removed if present.
+to be removed if present. If the parentheses contain a value, in either case
+they will be included in the link title.

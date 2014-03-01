@@ -9,6 +9,8 @@
     :license: BSD, see LICENSE for details.
 """
 
+from docutils import nodes
+
 from sphinx import addnodes
 from sphinx.directives import ObjectDescription
 from sphinx.domains import Domain, ObjType
@@ -16,8 +18,50 @@ from sphinx.domains.python import _pseudo_parse_arglist
 from sphinx.locale import l_, _
 from sphinx.roles import XRefRole
 from sphinx.util.compat import Directive
-from sphinx.util.docfields import Field, GroupedField, TypedField
+from sphinx.util.docfields import Field, TypedField
 from sphinx.util.nodes import make_refnode
+
+
+class SingleTypedField(Field):
+    """A doc field that occurs once and can contain type information.  It does
+    not have an argument.  The type can be linked using the given
+    *typerolename*.  Used in this domain to describe return values and types,
+    which are specified with :return: and :rtype: and are combined into a single
+    field list item.
+
+    Example::
+
+       :return: description of the return value
+       :rtype:  optional description of the return type
+    """
+    is_typed = True
+
+    def __init__(self, name, names=(), typenames=(), label=None,
+                 typerolename=None):
+        Field.__init__(self, name, names, label, False, None)
+        self.typenames = typenames
+        self.typerolename = typerolename
+
+    def make_field(self, types, domain, item):
+        def handle_item(fieldarg, content):
+            par = nodes.paragraph()
+            if fieldarg in types:
+                par += nodes.Text(' (')
+                fieldtype = types.pop(fieldarg)
+                if len(fieldtype) == 1 and isinstance(fieldtype[0], nodes.Text):
+                    typename = u''.join(n.astext() for n in fieldtype)
+                    par += self.make_xref(self.typerolename, domain, typename)
+                else:
+                    par += fieldtype
+                par += nodes.Text(') ')
+            par += content
+            return par
+
+        fieldname = nodes.field_name('', self.label)
+        fieldarg, content = item
+        bodynode = handle_item(fieldarg, content)
+        fieldbody = nodes.field_body('', bodynode)
+        return nodes.field('', fieldname, fieldbody)
 
 
 class LSObject(ObjectDescription):
@@ -28,27 +72,26 @@ class LSObject(ObjectDescription):
         # :ptype name: typename (optional)
         # - or -
         # :param typename name: description
-        TypedField('parameter', label=l_('Parameters'), can_collapse=True,
-                   names=('param', 'parameter'), typerolename='obj',
-                   typenames=('ptype', 'paramtype', 'type')),
+        TypedField('parameter', names=('param', 'parameter'),
+              typenames=('ptype', 'paramtype', 'type'),
+              label=l_('Parameters'), can_collapse=True),
         # :return: description
-        Field('returnvalue', label=l_('Returns'), has_arg=False,
-              names=('return', 'returns')),
-        # :rtype: typename
-        Field('returntype', label=l_('Return type'), has_arg=False,
-              names=('rtype', 'returntype')),
+        # :rtype: typename (optional)
+        SingleTypedField('return', names=('return', 'returns'),
+              typenames=('rtype', 'returntype'),
+              label=l_('Returns')),
         # :author: name
-        Field('author', label=l_('Author'), has_arg=False,
-              names=('author', 'authors')),
+        Field('author', names=('author', 'authors'),
+              label=l_('Author'), has_arg=False),
         # :see: resource
-        Field('seealso', label=l_('See also'), has_arg=False,
-              names=('see', 'url')),
+        Field('seealso', names=('see', 'url'),
+              label=l_('See also'), has_arg=False),
         # :parent: typename
-        Field('parent', label=l_('Parent type'), has_arg=False,
-              names=('parent', 'super')),
+        Field('parent', names=('parent', 'super'),
+              label=l_('Parent type'), has_arg=False),
         # :import: trait_name
-        Field('import', label=l_('Imports'), has_arg=False,
-              names=('import', 'imports')),
+        Field('import', names=('import', 'imports'),
+              label=l_('Imports'), has_arg=False),
     ]
 
     def needs_arglist(self):
@@ -70,7 +113,7 @@ class LSObject(ObjectDescription):
     def handle_signature(self, sig, signode):
         """Transform a Lasso signature into RST nodes.
         """
-        sig = sig.strip()
+        sig = sig.strip().replace('  ', ' ').replace(' ::', '::').replace(':: ', '::')
         if '(' in sig:
             if ')::' in sig:
                 sig, returntype = sig.rsplit('::', 1)
@@ -210,6 +253,10 @@ class LSXRefRole(XRefRole):
         if target[0:2] == '->':
             target = target[2:]
             refnode['refspecific'] = True
+        if '(' in target:
+            target = target.partition('(')[0]
+            if title.endswith('()'):
+                title = title[:-2]
         return title, target
 
 
