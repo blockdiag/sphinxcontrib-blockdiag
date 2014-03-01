@@ -61,7 +61,7 @@ List of extensions
 - googleanalytics: track web visitor statistics by using `Google Analytics`_
 - googlechart: embed charts by using `Google Chart`_
 - googlemaps: embed maps by using `Google Maps`_
-- httpdomain: a domain for documenting RESTful HTTP APIs.
+- httpdomain_: a domain for documenting RESTful HTTP APIs.
 - hyphenator: client-side hyphenation of HTML using hyphenator_
 - inlinesyntaxhighlight_: inline syntax highlighting
 - lassodomain: a domain for documenting Lasso_ source code
@@ -177,6 +177,8 @@ List of extensions
 .. _restbuilder: https://pypi.python.org/pypi/sphinxcontrib-restbuilder
 
 .. _Lasso: http://www.lassosoft.com/
+
+.. _httpdomain: https://pythonhosted.org/sphinxcontrib-httpdomain/
 
 For contributors
 ================
