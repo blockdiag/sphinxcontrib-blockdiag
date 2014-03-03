@@ -41,7 +41,7 @@ List of extensions
 - actdiag: embed activity diagrams by using actdiag_
 - adadomain: an extension for Ada support (Sphinx 1.0 needed)
 - ansi: parse ANSI color sequences inside documents
-- autoprogram: documenting CLI programs
+- autoprogram_: documenting CLI programs
 - autorun: Execute code in a ``runblock`` directive.
 - blockdiag: embed block diagrams by using blockdiag_
 - cheeseshop: easily link to PyPI packages
@@ -99,6 +99,8 @@ List of extensions
 - zopeext: provide an ``autointerface`` directive for using `Zope interfaces`_.
 
 .. _aafigure: https://launchpad.net/aafigure
+
+.. _autoprogram: https://pythonhosted.org/sphinxcontrib-autoprogram/
 
 .. _gnuplot: http://www.gnuplot.info/
 
