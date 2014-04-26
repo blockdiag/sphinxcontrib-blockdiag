@@ -252,7 +252,7 @@ def latex_visit_packetdiag(self, node):
 
 
 def on_doctree_resolved(self, doctree, docname):
-    if self.builder.name in ('gettext', 'singlehtml', 'html', 'latex', 'epub'):
+    if self.builder.format in ('html', 'latex'):
         return
 
     for node in doctree.traverse(packetdiag.utils.rst.nodes.packetdiag):
