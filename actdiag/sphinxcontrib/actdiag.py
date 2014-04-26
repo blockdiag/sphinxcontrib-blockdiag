@@ -309,7 +309,7 @@ def latex_visit_actdiag(self, node):
 
 
 def on_doctree_resolved(self, doctree, docname):
-    if self.builder.name in ('gettext', 'singlehtml', 'html', 'latex', 'epub'):
+    if self.builder.format in ('html', 'latex'):
         return
 
     for node in doctree.traverse(actdiag.utils.rst.nodes.actdiag):
