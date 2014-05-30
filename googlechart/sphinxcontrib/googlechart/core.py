@@ -2,6 +2,7 @@
 
 import re
 import urllib
+import regions
 from parser import parse_string
 
 
@@ -162,7 +163,7 @@ class GoogleChart(object):
             colors = chart.colors
             descriptions = chart.items
 
-        data = "|".join(labels)
+        data = "|".join(regions.converter(s) for s in labels)
         escaped = (",".join(desc).replace(',', '\,') for desc in descriptions)
         markers = "|".join("f%s,000000,0,%d,10" % (desc, index) for index, desc in enumerate(escaped))
         if len(labels) == len(colors):
