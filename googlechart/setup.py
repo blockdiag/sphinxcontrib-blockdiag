@@ -27,7 +27,7 @@ requires = ['Sphinx>=0.6', 'funcparserlib', 'setuptools']
 
 setup(
     name='sphinxcontrib-googlechart',
-    version='0.1.5',
+    version='0.2.0',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-googlechart',
     license='BSD',
