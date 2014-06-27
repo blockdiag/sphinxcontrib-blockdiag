@@ -32,7 +32,12 @@ import blockdiag.parser
 import blockdiag.builder
 import blockdiag.drawer
 import blockdiag.utils.rst.directives
+from blockdiag.utils.bootstrap import detectfont
 from blockdiag.utils.compat import u
+from blockdiag.utils.fontmap import FontMap
+
+# fontconfig; it will be initialized on `builder-inited` event.
+fontmap = None
 
 
 class BlockdiagError(SphinxError):
@@ -90,42 +95,6 @@ def get_image_filename(self, code, format, options, prefix='blockdiag'):
     return relfn, outfn
 
 
-def get_fontmap(self):
-    FontMap = blockdiag.utils.fontmap.FontMap
-
-    try:
-        fontmappath = self.builder.config.blockdiag_fontmap
-        fontmap = FontMap(fontmappath)
-    except:
-        attrname = '_blockdiag_fontmap_warned'
-        if not hasattr(self.builder, attrname):
-            msg = ('blockdiag cannot load "%s" as fontmap file, '
-                   'check the blockdiag_fontmap setting' % fontmappath)
-            self.builder.warn(msg)
-            setattr(self.builder, attrname, True)
-
-        fontmap = FontMap(None)
-
-    try:
-        fontpath = self.builder.config.blockdiag_fontpath
-        if isinstance(fontpath, blockdiag.utils.compat.string_types):
-            fontpath = [fontpath]
-
-        if fontpath:
-            config = namedtuple('Config', 'font')(fontpath)
-            _fontpath = blockdiag.utils.bootstrap.detectfont(config)
-            fontmap.set_default_font(_fontpath)
-    except:
-        attrname = '_blockdiag_fontpath_warned'
-        if not hasattr(self.builder, attrname):
-            msg = ('blockdiag cannot load "%s" as truetype font, '
-                   'check the blockdiag_fontpath setting' % fontpath)
-            self.builder.warn(msg)
-            setattr(self.builder, attrname, True)
-
-    return fontmap
-
-
 def get_anchor(self, refid, fromdocname):
     for docname in self.builder.env.found_docs:
         doctree = self.builder.env.get_doctree(docname)
@@ -151,7 +120,6 @@ def create_blockdiag(self, code, format, filename, options, prefix):
     Render blockdiag code into a PNG output file.
     """
     draw = None
-    fontmap = get_fontmap(self)
     try:
         tree = blockdiag.parser.parse_string(code)
         diagram = blockdiag.builder.ScreenNodeBuilder.build(tree)
@@ -308,6 +276,29 @@ def latex_visit_blockdiag(self, node):
     render_dot_latex(self, node, node['code'], node['options'])
 
 
+def on_builder_inited(self):
+    # initialize fontmap
+    global fontmap
+
+    try:
+        fontmappath = self.builder.config.blockdiag_fontmap
+        fontmap = FontMap(fontmappath)
+    except:
+        fontmap = FontMap(None)
+
+    try:
+        fontpath = self.builder.config.blockdiag_fontpath
+        if isinstance(fontpath, blockdiag.utils.compat.string_types):
+            fontpath = [fontpath]
+
+        if fontpath:
+            config = namedtuple('Config', 'font')(fontpath)
+            fontpath = detectfont(config)
+            fontmap.set_default_font(fontpath)
+    except:
+        pass
+
+
 def on_doctree_resolved(self, doctree, docname):
     if self.builder.format in ('html', 'latex'):
         return
@@ -340,4 +331,5 @@ def setup(app):
     app.add_config_value('blockdiag_debug', False, 'html')
     app.add_config_value('blockdiag_html_image_format', 'PNG', 'html')
     app.add_config_value('blockdiag_tex_image_format', 'PNG', 'html')
+    app.connect("builder-inited", on_builder_inited)
     app.connect("doctree-resolved", on_doctree_resolved)
