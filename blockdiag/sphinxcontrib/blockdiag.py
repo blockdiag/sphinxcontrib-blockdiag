@@ -12,7 +12,6 @@
 
 from __future__ import absolute_import
 
-import io
 import os
 import re
 import posixpath
@@ -115,7 +114,7 @@ def resolve_reference(self, href, options):
         return href
 
 
-def create_blockdiag(self, code, format, filename, options):
+def create_blockdiag(self, code, format, filename, options, **kwargs):
     """
     Render blockdiag code into a PNG output file.
     """
@@ -129,7 +128,7 @@ def create_blockdiag(self, code, format, filename, options):
 
         antialias = self.builder.config.blockdiag_antialias
         draw = blockdiag.drawer.DiagramDraw(format, diagram, filename,
-                                            fontmap=fontmap, antialias=antialias)
+                                            fontmap=fontmap, antialias=antialias, **kwargs)
 
     except Exception as e:
         if self.builder.config.blockdiag_debug:
@@ -138,19 +137,6 @@ def create_blockdiag(self, code, format, filename, options):
         raise BlockdiagError('blockdiag error:\n%s\n' % e)
 
     return draw
-
-
-def make_svgtag(self, image, relfn, trelfn, outfn,
-                alt, thumb_size, image_size):
-    svgtag_format = """<svg xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    alt="%s" width="%s" height="%s">%s
-    </svg>"""
-
-    code = io.open(outfn, 'r', encoding='utf-8-sig').read()
-
-    return (svgtag_format %
-            (alt, image_size[0], image_size[1], code))
 
 
 def make_imgtag(self, image, relfn, trelfn, outfn,
@@ -193,42 +179,55 @@ def make_imgtag(self, image, relfn, trelfn, outfn,
     return result
 
 
+def render_svg(self, node):
+    options = node['options']
+    relfn, outfn = get_image_filename(self, node['code'], 'SVG', options)
+
+    options['current_docname'] = self.builder.current_docname
+    image = create_blockdiag(self, node['code'], 'SVG', None, options, nodoctype=True)
+    image.draw()
+
+    if 'align' in options:
+        self.body.append('<div align="%s" class="align-%s">' % (options['align'], options['align']))
+        self.context.append('</div>\n')
+    else:
+        self.context.append('')
+
+    # reftarget
+    for node_id in node['ids']:
+        self.body.append('<span id="%s"></span>' % node_id)
+
+    # resize image
+    size = image.pagesize().resize(**options)
+    self.body.append(image.save(size))
+
+
 def render_dot_html(self, node, code, options, prefix='blockdiag',
                     imgcls=None, alt=None):
+    format = self.builder.config.blockdiag_html_image_format
+    relfn, outfn = get_image_filename(self, code, format, options, prefix)
+
+    options['current_docname'] = self.builder.current_docname
+    image = create_blockdiag(self, code, format, outfn, options)
+    image_size = image.pagesize()
+
+    if not os.path.isfile(outfn):
+        image.draw()
+        image.save()
+
+    # generate thumbnails
     trelfn = None
     thumb_size = None
-    try:
-        format = self.builder.config.blockdiag_html_image_format
-        relfn, outfn = get_image_filename(self, code, format, options, prefix)
+    if 'maxwidth' in options and options['maxwidth'] < image_size[0]:
+        thumb_prefix = prefix + '_thumb'
+        trelfn, toutfn = get_image_filename(self, code, format,
+                                            options, thumb_prefix)
 
-        options['current_docname'] = self.builder.current_docname
-        image = create_blockdiag(self, code, format, outfn, options)
-
-        if not os.path.isfile(outfn):
-            image.draw()
-            image.save()
-
-        # generate thumbnails
-        image_size = image.pagesize()
-        if 'maxwidth' in options and options['maxwidth'] < image_size[0]:
-            thumb_prefix = prefix + '_thumb'
-            trelfn, toutfn = get_image_filename(self, code, format,
-                                                options, thumb_prefix)
-
-            ratio = float(options['maxwidth']) / image_size[0]
-            thumb_size = (options['maxwidth'], image_size[1] * ratio)
-            if not os.path.isfile(toutfn):
-                image.filename = toutfn
-                image.save(thumb_size)
-
-    except UnicodeEncodeError:
-        msg = ("blockdiag error: UnicodeEncodeError caught "
-               "(check your font settings)")
-        self.builder.warn(msg)
-        raise nodes.SkipNode
-    except BlockdiagError as exc:
-        self.builder.warn('dot code %r: ' % code + str(exc))
-        raise nodes.SkipNode
+        ratio = float(options['maxwidth']) / image_size[0]
+        thumb_size = (options['maxwidth'], image_size[1] * ratio)
+        if not os.path.isfile(toutfn):
+            image.filename = toutfn
+            image.save(thumb_size)
 
     self.body.append(self.starttag(node, 'p', CLASS='blockdiag'))
     if relfn is None:
@@ -237,20 +236,30 @@ def render_dot_html(self, node, code, options, prefix='blockdiag',
         if alt is None:
             alt = node.get('alt', self.encode(code).strip())
 
-        if format.upper() == 'SVG':
-            tagfunc = make_svgtag
-        else:
-            tagfunc = make_imgtag
+        self.body.append(make_imgtag(self, image, relfn, trelfn, outfn, alt,
+                                     thumb_size, image_size))
 
-        self.body.append(tagfunc(self, image, relfn, trelfn, outfn, alt,
-                                 thumb_size, image_size))
-
-    self.body.append('</p>\n')
-    raise nodes.SkipNode
+    self.context.append('</p>\n')
 
 
 def html_visit_blockdiag(self, node):
-    render_dot_html(self, node, node['code'], node['options'])
+    try:
+        if self.builder.config.blockdiag_html_image_format.upper() == 'SVG':
+            render_svg(self, node)
+        else:
+            render_dot_html(self, node, node['code'], node['options'])
+    except UnicodeEncodeError:
+        msg = ("blockdiag error: UnicodeEncodeError caught "
+               "(check your font settings)")
+        self.builder.warn(msg)
+        raise nodes.SkipNode
+    except BlockdiagError as exc:
+        self.builder.warn('dot code %r: ' % node['code'] + str(exc))
+        raise nodes.SkipNode
+
+
+def html_depart_blockdiag(self, node):
+    self.body.append(self.context.pop())
 
 
 def get_image_format_for(builder):
@@ -310,7 +319,7 @@ def on_doctree_resolved(self, doctree, docname):
 
 def setup(app):
     app.add_node(blockdiag.utils.rst.nodes.blockdiag,
-                 html=(html_visit_blockdiag, None))
+                 html=(html_visit_blockdiag, html_depart_blockdiag))
     app.add_directive('blockdiag', Blockdiag)
     app.add_config_value('blockdiag_fontpath', None, 'html')
     app.add_config_value('blockdiag_fontmap', None, 'html')
