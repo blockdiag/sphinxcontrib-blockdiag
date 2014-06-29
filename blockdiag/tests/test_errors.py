@@ -48,7 +48,7 @@ class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
             app.builder.warn = Mock()
             app.builder.build_all()
 
-            self.assertIn('could not output PDF format; Install reportlab',
+            self.assertIn('Could not output PDF format. Install reportlab.',
                           app.builder.warn.call_args_list[0][0][0])
         finally:
             sys.path = path

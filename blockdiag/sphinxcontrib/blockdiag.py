@@ -60,22 +60,11 @@ class Blockdiag(blockdiag.utils.rst.directives.BlockdiagDirective):
         return node
 
 
-def get_image_filename(self, code, format, options, prefix='blockdiag'):
+def get_image_filename(self, node, format, prefix='blockdiag'):
     """
     Get path of output file.
     """
-    if format.upper() not in ('PNG', 'PDF', 'SVG'):
-        raise BlockdiagError('blockdiag error:\nunknown format: %s\n' % format)
-
-    if format.upper() == 'PDF':
-        try:
-            __import__("reportlab")
-        except ImportError:
-            msg = 'blockdiag error:\n' + \
-                  'could not output PDF format; Install reportlab\n'
-            raise BlockdiagError(msg)
-
-    hashkey = (code + str(options)).encode('utf-8')
+    hashkey = (node['code'] + str(node['options'])).encode('utf-8')
     fname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), format.lower())
     if hasattr(self.builder, 'imgpath'):
         # HTML
@@ -181,7 +170,7 @@ def make_imgtag(self, image, relfn, trelfn, outfn,
 
 def render_svg(self, node):
     options = node['options']
-    relfn, outfn = get_image_filename(self, node['code'], 'SVG', options)
+    relfn, outfn = get_image_filename(self, node, 'SVG')
 
     options['current_docname'] = self.builder.current_docname
     image = create_blockdiag(self, node['code'], 'SVG', None, options, nodoctype=True)
@@ -205,7 +194,7 @@ def render_svg(self, node):
 def render_dot_html(self, node, code, options, prefix='blockdiag',
                     imgcls=None, alt=None):
     format = self.builder.config.blockdiag_html_image_format
-    relfn, outfn = get_image_filename(self, code, format, options, prefix)
+    relfn, outfn = get_image_filename(self, node, format, prefix)
 
     options['current_docname'] = self.builder.current_docname
     image = create_blockdiag(self, code, format, outfn, options)
@@ -220,8 +209,7 @@ def render_dot_html(self, node, code, options, prefix='blockdiag',
     thumb_size = None
     if 'maxwidth' in options and options['maxwidth'] < image_size[0]:
         thumb_prefix = prefix + '_thumb'
-        trelfn, toutfn = get_image_filename(self, code, format,
-                                            options, thumb_prefix)
+        trelfn, toutfn = get_image_filename(self, node, format, thumb_prefix)
 
         ratio = float(options['maxwidth']) / image_size[0]
         thumb_size = (options['maxwidth'], image_size[1] * ratio)
@@ -244,7 +232,8 @@ def render_dot_html(self, node, code, options, prefix='blockdiag',
 
 def html_visit_blockdiag(self, node):
     try:
-        if self.builder.config.blockdiag_html_image_format.upper() == 'SVG':
+        image_format = get_image_format_for(self.builder)
+        if image_format.upper() == 'SVG':
             render_svg(self, node)
         else:
             render_dot_html(self, node, node['code'], node['options'])
@@ -264,14 +253,25 @@ def html_depart_blockdiag(self, node):
 
 def get_image_format_for(builder):
     if builder.format == 'html':
-        return builder.config.blockdiag_html_image_format.upper()
+        image_format = builder.config.blockdiag_html_image_format.upper()
     elif builder.format == 'latex':
         if builder.config.blockdiag_tex_image_format:
-            return builder.config.blockdiag_tex_image_format.upper()
+            image_format = builder.config.blockdiag_tex_image_format.upper()
         else:
-            return builder.config.blockdiag_latex_image_format.upper()
+            image_format = builder.config.blockdiag_latex_image_format.upper()
     else:
-        return 'PNG'
+        image_format = 'PNG'
+
+    if image_format.upper() not in ('PNG', 'PDF', 'SVG'):
+        raise BlockdiagError('unknown format: %s' % image_format)
+
+    if image_format.upper() == 'PDF':
+        try:
+            import reportlab  # NOQA: importing test
+        except ImportError:
+            raise BlockdiagError('Could not output PDF format. Install reportlab.')
+
+    return image_format
 
 
 def on_builder_inited(self):
@@ -305,12 +305,20 @@ def on_doctree_resolved(self, doctree, docname):
     if self.builder.format == 'html':
         return
 
-    image_format = get_image_format_for(self.builder)
+    try:
+        image_format = get_image_format_for(self.builder)
+    except BlockdiagError as exc:
+        self.builder.warn('blockdiag error: %s' % exc)
+        for node in doctree.traverse(blockdiag.utils.rst.nodes.blockdiag):
+            node.parent.remove(node)
+
+        return
+
     for node in doctree.traverse(blockdiag.utils.rst.nodes.blockdiag):
         try:
             code = node['code']
             options = node['options']
-            relfn, outfn = get_image_filename(self, code, image_format, options)
+            relfn, outfn = get_image_filename(self, node, image_format)
 
             image = create_blockdiag(self, code, image_format, outfn, options)
             if not os.path.isfile(outfn):
