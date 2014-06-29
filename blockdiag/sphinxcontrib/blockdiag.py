@@ -266,12 +266,19 @@ def get_image_format_for(builder):
     if builder.format == 'html':
         return builder.config.blockdiag_html_image_format.upper()
     elif builder.format == 'latex':
-        return builder.config.blockdiag_tex_image_format.upper()
+        if builder.config.blockdiag_tex_image_format:
+            return builder.config.blockdiag_tex_image_format.upper()
+        else:
+            return builder.config.blockdiag_latex_image_format.upper()
     else:
         return 'PNG'
 
 
 def on_builder_inited(self):
+    # show deprecated message
+    if self.builder.config.blockdiag_tex_image_format:
+        self.builder.warn('blockdiag_tex_image_format is deprecated. Use blockdiag_latex_image_format.')
+
     # initialize fontmap
     global fontmap
 
@@ -326,6 +333,7 @@ def setup(app):
     app.add_config_value('blockdiag_antialias', False, 'html')
     app.add_config_value('blockdiag_debug', False, 'html')
     app.add_config_value('blockdiag_html_image_format', 'PNG', 'html')
-    app.add_config_value('blockdiag_tex_image_format', 'PNG', 'html')
+    app.add_config_value('blockdiag_tex_image_format', None, 'html')  # backward compatibility for 1.3.1
+    app.add_config_value('blockdiag_latex_image_format', 'PNG', 'html')
     app.connect("builder-inited", on_builder_inited)
     app.connect("doctree-resolved", on_doctree_resolved)

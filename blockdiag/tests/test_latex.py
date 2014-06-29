@@ -21,6 +21,14 @@ pdf_config = dict(
     extensions=['sphinxcontrib.blockdiag'],
     master_doc='index',
     latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
+    blockdiag_latex_image_format='PDF',
+    blockdiag_fontpath='/usr/share/fonts/truetype/ipafont/ipagp.ttf',
+)
+
+pdf_config_oldstyle = dict(
+    extensions=['sphinxcontrib.blockdiag'],
+    master_doc='index',
+    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
     blockdiag_tex_image_format='PDF',
     blockdiag_fontpath='/usr/share/fonts/truetype/ipafont/ipagp.ttf',
 )
@@ -42,7 +50,21 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
     @unittest.skipUnless(os.path.exists(pdf_config['blockdiag_fontpath']), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
     @with_built_docstring(buildername='latex', confoverrides=pdf_config)
-    def test_build_pdf_image(self, app):
+    def test_build_pdf_image1(self, app):
+        """
+        .. blockdiag::
+
+           A -> B;
+        """
+        filename = os.path.join(app.outdir, 'test.tex')
+        with open(filename) as fd:
+            source = fd.read()
+            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.pdf}')
+
+    @unittest.skipUnless(os.path.exists(pdf_config['blockdiag_fontpath']), "TrueType font not found")
+    @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
+    @with_built_docstring(buildername='latex', confoverrides=pdf_config_oldstyle)
+    def test_build_pdf_image2(self, app):
         """
         .. blockdiag::
 
