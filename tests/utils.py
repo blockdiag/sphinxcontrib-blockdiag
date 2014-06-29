@@ -66,6 +66,7 @@ class FakeSphinx(Sphinx):
         outdir = os.path.join(self.builddir, str(buildername))
         doctreedir = os.path.join(self.builddir, 'doctrees')
 
+        os.mkdir(outdir)
         self.cleanup_dirs.append(self.builddir)
 
         # misc settings
@@ -111,6 +112,24 @@ def with_app(*sphinxargs, **sphinxkwargs):
                     app.cleanup()
         return decorator
 
+    return testcase
+
+
+def with_built_docstring(**sphinxargs):
+    def testcase(func):
+        @wraps(func)
+        @with_app(srcdir=None, **sphinxargs)
+        def decorator(*args):
+            app = args[-1]
+            index_rst = os.path.join(app.srcdir, 'index.rst')
+            with open(index_rst, 'wt') as fd:
+                fd.write('heading\n')
+                fd.write('=======\n')
+                fd.write(trim_docstring(func.__doc__))
+            app.builder.build_all()
+            func(*args)
+
+        return decorator
     return testcase
 
 
