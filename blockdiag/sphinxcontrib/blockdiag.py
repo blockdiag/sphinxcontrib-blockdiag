@@ -115,7 +115,7 @@ def resolve_reference(self, href, options):
         return href
 
 
-def create_blockdiag(self, code, format, filename, options, prefix):
+def create_blockdiag(self, code, format, filename, options):
     """
     Render blockdiag code into a PNG output file.
     """
@@ -202,7 +202,7 @@ def render_dot_html(self, node, code, options, prefix='blockdiag',
         relfn, outfn = get_image_filename(self, code, format, options, prefix)
 
         options['current_docname'] = self.builder.current_docname
-        image = create_blockdiag(self, code, format, outfn, options, prefix)
+        image = create_blockdiag(self, code, format, outfn, options)
 
         if not os.path.isfile(outfn):
             image.draw()
@@ -253,27 +253,13 @@ def html_visit_blockdiag(self, node):
     render_dot_html(self, node, node['code'], node['options'])
 
 
-def render_dot_latex(self, node, code, options, prefix='blockdiag'):
-    try:
-        format = self.builder.config.blockdiag_tex_image_format
-        fname, outfn = get_image_filename(self, code, format, options, prefix)
-
-        image = create_blockdiag(self, code, format, outfn, options, prefix)
-        if not os.path.isfile(outfn):
-            image.draw()
-            image.save()
-
-    except BlockdiagError as exc:
-        self.builder.warn('dot code %r: ' % code + str(exc))
-        raise nodes.SkipNode
-
-    if fname is not None:
-        self.body.append('\\par\\includegraphics{%s}\\par' % fname)
-    raise nodes.SkipNode
-
-
-def latex_visit_blockdiag(self, node):
-    render_dot_latex(self, node, node['code'], node['options'])
+def get_image_format_for(builder):
+    if builder.format == 'html':
+        return builder.config.blockdiag_html_image_format.upper()
+    elif builder.format == 'latex':
+        return builder.config.blockdiag_tex_image_format.upper()
+    else:
+        return 'PNG'
 
 
 def on_builder_inited(self):
@@ -300,30 +286,31 @@ def on_builder_inited(self):
 
 
 def on_doctree_resolved(self, doctree, docname):
-    if self.builder.format in ('html', 'latex'):
+    if self.builder.format == 'html':
         return
 
+    image_format = get_image_format_for(self.builder)
     for node in doctree.traverse(blockdiag.utils.rst.nodes.blockdiag):
-        code = node['code']
-        prefix = 'blockdiag'
-        format = 'PNG'
-        options = node['options']
-        relfn, outfn = get_image_filename(self, code, format, options, prefix)
+        try:
+            code = node['code']
+            options = node['options']
+            relfn, outfn = get_image_filename(self, code, image_format, options)
 
-        image = create_blockdiag(self, code, format, outfn, options, prefix)
-        if not os.path.isfile(outfn):
-            image.draw()
-            image.save()
+            image = create_blockdiag(self, code, image_format, outfn, options)
+            if not os.path.isfile(outfn):
+                image.draw()
+                image.save()
 
-        candidates = {'image/png': relfn}
-        image = nodes.image(uri=outfn, candidates=candidates)
-        node.parent.replace(node, image)
+            image = nodes.image(uri=outfn, candidates={'*': relfn}, **options)
+            node.parent.replace(node, image)
+        except BlockdiagError as exc:
+            self.builder.warn('dot code %r: ' % code + str(exc))
+            node.parent.remove(node)
 
 
 def setup(app):
     app.add_node(blockdiag.utils.rst.nodes.blockdiag,
-                 html=(html_visit_blockdiag, None),
-                 latex=(latex_visit_blockdiag, None))
+                 html=(html_visit_blockdiag, None))
     app.add_directive('blockdiag', Blockdiag)
     app.add_config_value('blockdiag_fontpath', None, 'html')
     app.add_config_value('blockdiag_fontmap', None, 'html')

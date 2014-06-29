@@ -39,11 +39,19 @@ class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
 
     @with_app(srcdir='docs/basic', confoverrides=dict(blockdiag_html_image_format='PDF'))
     def test_reportlab_not_found_error(self, app):
-        app.builder.warn = Mock()
-        app.builder.build_all()
+        try:
+            # unload reportlab and make loading it impossible
+            sys.modules.pop('reportlab', None)
+            path = sys.path
+            sys.path = []
 
-        self.assertIn('could not output PDF format; Install reportlab',
-                      app.builder.warn.call_args_list[0][0][0])
+            app.builder.warn = Mock()
+            app.builder.build_all()
+
+            self.assertIn('could not output PDF format; Install reportlab',
+                          app.builder.warn.call_args_list[0][0][0])
+        finally:
+            sys.path = path
 
     @with_app(srcdir='docs/basic')
     @patch("sphinxcontrib.blockdiag.blockdiag.drawer.DiagramDraw")
