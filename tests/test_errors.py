@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from mock import patch, Mock
-from utils import FakeSphinx, with_app, with_parsed
+from .utils import FakeSphinx, with_app, with_parsed
 import sphinxcontrib.blockdiag
+from blockdiag.utils.compat import u
 
 import sys
 if sys.version_info < (2, 7):
@@ -45,7 +46,7 @@ class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
                       app.builder.warn.call_args_list[0][0][0])
 
     @with_app(srcdir='docs/basic')
-    @patch("sphinxcontrib.blockdiag.blockdiag.core.drawer.DiagramDraw")
+    @patch("sphinxcontrib.blockdiag.blockdiag.drawer.DiagramDraw")
     def test_rendering_error(self, app, DiagramDraw):
         DiagramDraw.side_effect = RuntimeError("UNKNOWN ERROR!")
         app.builder.warn = Mock()
@@ -55,9 +56,9 @@ class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
                       app.builder.warn.call_args_list[0][0][0])
 
     @with_app(srcdir='docs/basic')
-    @patch("sphinxcontrib.blockdiag.blockdiag.core.drawer.DiagramDraw.draw")
+    @patch("sphinxcontrib.blockdiag.blockdiag.drawer.DiagramDraw.draw")
     def test_font_settings_error(self, app, draw):
-        draw.side_effect = UnicodeEncodeError("", "".decode('utf-8'), 0, 0, "")
+        draw.side_effect = UnicodeEncodeError("", u(""), 0, 0, "")
         app.builder.warn = Mock()
         app.builder.build_all()
 
