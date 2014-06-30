@@ -23,7 +23,6 @@ except ImportError:
     from sha import sha
 
 from docutils import nodes
-from sphinx.errors import SphinxError
 from sphinx.util.osutil import ensuredir
 
 import blockdiag
@@ -37,10 +36,6 @@ from blockdiag.utils.fontmap import FontMap
 
 # fontconfig; it will be initialized on `builder-inited` event.
 fontmap = None
-
-
-class BlockdiagError(SphinxError):
-    category = 'Blockdiag error'
 
 
 class Blockdiag(blockdiag.utils.rst.directives.BlockdiagDirective):
@@ -107,11 +102,11 @@ def create_blockdiag(self, code, format, filename, options, **kwargs):
         draw = blockdiag.drawer.DiagramDraw(format, diagram, filename,
                                             fontmap=fontmap, antialias=antialias, **kwargs)
 
-    except Exception as e:
+    except:
         if self.builder.config.blockdiag_debug:
             traceback.print_exc()
 
-        raise BlockdiagError('blockdiag error:\n%s\n' % e)
+        raise
 
     return draw
 
@@ -230,8 +225,8 @@ def html_visit_blockdiag(self, node):
                "(check your font settings)")
         self.builder.warn(msg)
         raise nodes.SkipNode
-    except BlockdiagError as exc:
-        self.builder.warn('dot code %r: ' % node['code'] + str(exc))
+    except Exception as exc:
+        self.builder.warn('dot code %r: %s' % (node['code'], str(exc)))
         raise nodes.SkipNode
 
 
@@ -251,13 +246,13 @@ def get_image_format_for(builder):
         image_format = 'PNG'
 
     if image_format.upper() not in ('PNG', 'PDF', 'SVG'):
-        raise BlockdiagError('unknown format: %s' % image_format)
+        raise ValueError('unknown format: %s' % image_format)
 
     if image_format.upper() == 'PDF':
         try:
             import reportlab  # NOQA: importing test
         except ImportError:
-            raise BlockdiagError('Could not output PDF format. Install reportlab.')
+            raise ImportError('Could not output PDF format. Install reportlab.')
 
     return image_format
 
@@ -295,7 +290,7 @@ def on_doctree_resolved(self, doctree, docname):
 
     try:
         image_format = get_image_format_for(self.builder)
-    except BlockdiagError as exc:
+    except Exception as exc:
         self.builder.warn('blockdiag error: %s' % exc)
         for node in doctree.traverse(blockdiag.utils.rst.nodes.blockdiag):
             node.parent.remove(node)
@@ -315,8 +310,8 @@ def on_doctree_resolved(self, doctree, docname):
 
             image = nodes.image(uri=outfn, candidates={'*': relfn}, **options)
             node.parent.replace(node, image)
-        except BlockdiagError as exc:
-            self.builder.warn('dot code %r: ' % code + str(exc))
+        except Exception as exc:
+            self.builder.warn('dot code %r: %s' % (node['code'], str(exc)))
             node.parent.remove(node)
 
 

@@ -54,13 +54,13 @@ class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
             sys.path = path
 
     @with_app(srcdir='docs/basic')
-    @patch("sphinxcontrib.blockdiag.blockdiag.drawer.DiagramDraw")
+    @patch("blockdiag.drawer.DiagramDraw")
     def test_rendering_error(self, app, DiagramDraw):
         DiagramDraw.side_effect = RuntimeError("UNKNOWN ERROR!")
         app.builder.warn = Mock()
         app.builder.build_all()
 
-        self.assertIn('blockdiag error:\nUNKNOWN ERROR!',
+        self.assertIn('UNKNOWN ERROR!',
                       app.builder.warn.call_args_list[0][0][0])
 
     @with_app(srcdir='docs/basic')
