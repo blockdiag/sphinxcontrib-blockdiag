@@ -10,6 +10,8 @@
     :license: BSDL.
 """
 
+from __future__ import absolute_import
+
 import io
 import os
 import re
@@ -25,8 +27,12 @@ from docutils import nodes
 from sphinx.errors import SphinxError
 from sphinx.util.osutil import ensuredir
 
-import blockdiag_sphinxhelper as blockdiag
-u = blockdiag.utils.compat.u
+import blockdiag
+import blockdiag.parser
+import blockdiag.builder
+import blockdiag.drawer
+import blockdiag.utils.rst.directives
+from blockdiag.utils.compat import u
 
 
 class BlockdiagError(SphinxError):
@@ -37,7 +43,7 @@ class Blockdiag(blockdiag.utils.rst.directives.BlockdiagDirective):
     def run(self):
         try:
             return super(Blockdiag, self).run()
-        except blockdiag.core.parser.ParseException as e:
+        except blockdiag.parser.ParseException as e:
             if self.content:
                 msg = '[%s] ParseError: %s\n%s' % (self.name, e, "\n".join(self.content))
             else:
@@ -147,15 +153,15 @@ def create_blockdiag(self, code, format, filename, options, prefix):
     draw = None
     fontmap = get_fontmap(self)
     try:
-        tree = blockdiag.core.parser.parse_string(code)
-        diagram = blockdiag.core.builder.ScreenNodeBuilder.build(tree)
+        tree = blockdiag.parser.parse_string(code)
+        diagram = blockdiag.builder.ScreenNodeBuilder.build(tree)
         for node in diagram.traverse_nodes():
             if node.href:
                 node.href = resolve_reference(self, node.href, options)
 
         antialias = self.builder.config.blockdiag_antialias
-        draw = blockdiag.core.drawer.DiagramDraw(format, diagram, filename,
-                                                 fontmap=fontmap, antialias=antialias)
+        draw = blockdiag.drawer.DiagramDraw(format, diagram, filename,
+                                            fontmap=fontmap, antialias=antialias)
 
     except Exception as e:
         if self.builder.config.blockdiag_debug:
