@@ -111,46 +111,6 @@ def create_blockdiag(self, code, format, filename, options, **kwargs):
     return draw
 
 
-def make_imgtag(self, image, relfn, trelfn, outfn,
-                alt, thumb_size, image_size):
-    result = ""
-
-    clickable_map = []
-    for n in image.nodes:
-        if n.href:
-            cell = image.metrics.cell(n)
-            clickable_map.append((cell, n.href))
-
-    if clickable_map:
-        imgtag_format = '<img src="%s" alt="%s" width="%s" '
-        imgtag_format += 'usemap="#map_%d" height="%%s" />\n' % id(image)
-    else:
-        imgtag_format = '<img src="%s" alt="%s" width="%s" height="%s" />\n'
-
-    if trelfn:
-        result += ('<a href="%s">' % relfn)
-        result += (imgtag_format %
-                   (trelfn, alt, thumb_size[0], thumb_size[1]))
-        result += ('</a>')
-    else:
-        result += (imgtag_format %
-                   (relfn, alt, image_size[0], image_size[1]))
-
-    if clickable_map:
-        result += ('<map name="map_%d">' % id(image))
-        rect_format = '<area shape="rect" coords="%s,%s,%s,%s" href="%s">'
-        for m in clickable_map:
-            x1 = m[0].x1
-            y1 = m[0].y1
-            x2 = m[0].x2
-            y2 = m[0].y2
-            result += (rect_format % (x1, y1, x2, y2, m[1]))
-
-        result += ('</map>')
-
-    return result
-
-
 def render_svg(self, node):
     options = node['options']
     relfn, outfn = get_image_filename(self, node, 'SVG')
@@ -172,45 +132,71 @@ def render_svg(self, node):
     # resize image
     size = image.pagesize().resize(**options)
     self.body.append(image.save(size))
+    self.context.append('')
 
 
-def render_dot_html(self, node, code, options, prefix='blockdiag',
-                    imgcls=None, alt=None):
+def create_maptag(self, image, width_ratio, height_ratio):
+    href_nodes = [node for node in image.nodes if node.href]
+    if not href_nodes:
+        return
+
+    self.body.append('<map name="map_%d">' % id(image))
+    for node in href_nodes:
+        x1, y1, x2, y2 = image.metrics.cell(node)
+
+        x1 *= width_ratio
+        x2 *= width_ratio
+        y1 *= height_ratio
+        y2 *= height_ratio
+        areatag = '<area shape="rect" coords="%s,%s,%s,%s" href="%s">' % (x1, y1, x2, y2, node.href)
+        self.body.append(areatag)
+
+    self.body.append('</map>')
+
+
+def render_dot_html(self, node, options):
     format = self.builder.config.blockdiag_html_image_format
-    relfn, outfn = get_image_filename(self, node, format, prefix)
+    relfn, outfn = get_image_filename(self, node, format)
 
     options['current_docname'] = self.builder.current_docname
-    image = create_blockdiag(self, code, format, outfn, options)
-    image_size = image.pagesize()
+    image = create_blockdiag(self, node['code'], format, outfn, options)
 
     if not os.path.isfile(outfn):
         image.draw()
         image.save()
 
-    # generate thumbnails
-    trelfn = None
-    thumb_size = None
-    if 'maxwidth' in options and options['maxwidth'] < image_size[0]:
-        thumb_prefix = prefix + '_thumb'
-        trelfn, toutfn = get_image_filename(self, node, format, thumb_prefix)
-
-        ratio = float(options['maxwidth']) / image_size[0]
-        thumb_size = (options['maxwidth'], image_size[1] * ratio)
-        if not os.path.isfile(toutfn):
-            image.filename = toutfn
-            image.save(thumb_size)
-
-    self.body.append(self.starttag(node, 'p', CLASS='blockdiag'))
-    if relfn is None:
-        self.body.append(self.encode(code))
+    # align
+    if 'align' in node['options']:
+        self.body.append('<div align="%s" class="align-%s">' % (options['align'], options['align']))
+        self.context.append('</div>\n')
     else:
-        if alt is None:
-            alt = node.get('alt', self.encode(code).strip())
+        self.context.append('')
 
-        self.body.append(make_imgtag(self, image, relfn, trelfn, outfn, alt,
-                                     thumb_size, image_size))
+    # link to original image
+    if 'width' in node['options'] or 'height' in node['options'] or 'scale' in node['options']:
+        self.body.append('<a class="reference internal image-reference" href="%s">' % relfn)
+        self.context.append('</a>')
+    else:
+        self.context.append('')
 
-    self.context.append('</p>\n')
+    # <img> tag
+    original_size = image.pagesize()
+    resized = original_size.resize(**node['options'])
+    img_attr = dict(src=relfn,
+                    width=resized.width,
+                    height=resized.height)
+
+    if any(node.href for node in image.nodes):
+        img_attr['usemap'] = "#map_%d" % id(image)
+
+        width_ratio = float(resized.width) / original_size.width
+        height_ratio = float(resized.height) / original_size.height
+        create_maptag(self, image, width_ratio, height_ratio)
+
+    if 'alt' in node['options']:
+        img_attr['alt'] = node['options']['alt']
+
+    self.body.append(self.starttag(node, 'img', '', empty=True, **img_attr))
 
 
 def html_visit_blockdiag(self, node):
@@ -219,7 +205,7 @@ def html_visit_blockdiag(self, node):
         if image_format.upper() == 'SVG':
             render_svg(self, node)
         else:
-            render_dot_html(self, node, node['code'], node['options'])
+            render_dot_html(self, node, node['options'])
     except UnicodeEncodeError:
         msg = ("blockdiag error: UnicodeEncodeError caught "
                "(check your font settings)")
@@ -231,6 +217,7 @@ def html_visit_blockdiag(self, node):
 
 
 def html_depart_blockdiag(self, node):
+    self.body.append(self.context.pop())
     self.body.append(self.context.pop())
 
 
