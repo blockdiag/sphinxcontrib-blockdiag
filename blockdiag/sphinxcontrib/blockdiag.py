@@ -14,21 +14,12 @@ from __future__ import absolute_import
 
 import os
 import re
-import posixpath
 import traceback
 from collections import namedtuple
-try:
-    from hashlib import sha1 as sha
-except ImportError:
-    from sha import sha
-
 from docutils import nodes
 from sphinx.util.osutil import ensuredir
 
-import blockdiag
-import blockdiag.parser
-import blockdiag.builder
-import blockdiag.drawer
+import blockdiag.utils.rst.nodes
 import blockdiag.utils.rst.directives
 from blockdiag.utils.bootstrap import detectfont
 from blockdiag.utils.compat import u
@@ -38,89 +29,79 @@ from blockdiag.utils.fontmap import FontMap
 fontmap = None
 
 
+class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
+    def to_drawer(self, image_format, builder, **kwargs):
+        if 'filename' in kwargs:
+            filename = kwargs.pop('filename')
+        else:
+            filename = self.get_abspath(image_format, builder)
+
+        antialias = builder.config.blockdiag_antialias
+        image = super(blockdiag_node, self).to_drawer(image_format, filename, fontmap,
+                                                      antialias=antialias, **kwargs)
+        for node in image.diagram.traverse_nodes():
+            node.href = resolve_reference(builder, node.href)
+
+        return image
+
+    def get_relpath(self, image_format, builder):
+        options = dict(antialias=builder.config.blockdiag_antialias,
+                       fontpath=builder.config.blockdiag_fontpath,
+                       fontmap=builder.config.blockdiag_fontmap,
+                       format=image_format)
+        outputdir = getattr(builder, 'imgpath', builder.outdir)
+        return self.get_path(outputdir=outputdir, **options)
+
+    def get_abspath(self, image_format, builder):
+        options = dict(antialias=builder.config.blockdiag_antialias,
+                       fontpath=builder.config.blockdiag_fontpath,
+                       fontmap=builder.config.blockdiag_fontmap,
+                       format=image_format)
+
+        if hasattr(builder, 'imgpath'):
+            outputdir = os.path.join(builder.outdir, '_images')
+        else:
+            outputdir = builder.outdir
+        path = self.get_path(outputdir=outputdir, **options)
+        ensuredir(os.path.dirname(path))
+
+        return path
+
+
 class Blockdiag(blockdiag.utils.rst.directives.BlockdiagDirective):
+    node_class = blockdiag_node
+
     def node2image(self, node, diagram):
         return node
 
 
-def get_image_filename(self, node, format, prefix='blockdiag'):
-    """
-    Get path of output file.
-    """
-    hashkey = (node['code'] + str(node['options'])).encode('utf-8')
-    fname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), format.lower())
-    if hasattr(self.builder, 'imgpath'):
-        # HTML
-        relfn = posixpath.join(self.builder.imgpath, fname)
-        outfn = os.path.join(self.builder.outdir, '_images', fname)
-    else:
-        # LaTeX
-        relfn = fname
-        outfn = os.path.join(self.builder.outdir, fname)
-
-    if os.path.isfile(outfn):
-        return relfn, outfn
-
-    ensuredir(os.path.dirname(outfn))
-
-    return relfn, outfn
-
-
-def get_anchor(self, refid, fromdocname):
-    for docname in self.builder.env.found_docs:
-        doctree = self.builder.env.get_doctree(docname)
+def get_anchor(builder, refid):
+    for docname in builder.env.found_docs:
+        doctree = builder.env.get_doctree(docname)
         for target in doctree.traverse(nodes.Targetable):
             if target.attributes.get('refid') == refid:
-                targetfile = self.builder.get_relative_uri(fromdocname, docname)
+                targetfile = builder.get_relative_uri(builder.current_docname, docname)
                 return targetfile + "#" + refid
 
 
-def resolve_reference(self, href, options):
+def resolve_reference(builder, href):
     if href is None:
         return
     pattern = re.compile(u("^:ref:`(.+?)`"), re.UNICODE)
     matched = pattern.search(href)
     if matched:
-        return get_anchor(self, matched.group(1), options.get('current_docname', ''))
+        return get_anchor(builder, matched.group(1))
     else:
         return href
 
 
-def create_blockdiag(self, code, format, filename, options, **kwargs):
-    """
-    Render blockdiag code into a PNG output file.
-    """
-    draw = None
-    try:
-        tree = blockdiag.parser.parse_string(code)
-        diagram = blockdiag.builder.ScreenNodeBuilder.build(tree)
-        for node in diagram.traverse_nodes():
-            if node.href:
-                node.href = resolve_reference(self, node.href, options)
-
-        antialias = self.builder.config.blockdiag_antialias
-        draw = blockdiag.drawer.DiagramDraw(format, diagram, filename,
-                                            fontmap=fontmap, antialias=antialias, **kwargs)
-
-    except:
-        if self.builder.config.blockdiag_debug:
-            traceback.print_exc()
-
-        raise
-
-    return draw
-
-
-def render_svg(self, node):
-    options = node['options']
-    relfn, outfn = get_image_filename(self, node, 'SVG')
-
-    options['current_docname'] = self.builder.current_docname
-    image = create_blockdiag(self, node['code'], 'SVG', None, options, nodoctype=True)
+def html_render_svg(self, node):
+    image = node.to_drawer('SVG', self.builder, filename=None, nodoctype=True)
     image.draw()
 
-    if 'align' in options:
-        self.body.append('<div align="%s" class="align-%s">' % (options['align'], options['align']))
+    if 'align' in node['options']:
+        align = node['options']['align']
+        self.body.append('<div align="%s" class="align-%s">' % (align, align))
         self.context.append('</div>\n')
     else:
         self.context.append('')
@@ -130,12 +111,12 @@ def render_svg(self, node):
         self.body.append('<span id="%s"></span>' % node_id)
 
     # resize image
-    size = image.pagesize().resize(**options)
+    size = image.pagesize().resize(**node['options'])
     self.body.append(image.save(size))
     self.context.append('')
 
 
-def create_maptag(self, image, width_ratio, height_ratio):
+def html_render_clickablemap(self, image, width_ratio, height_ratio):
     href_nodes = [node for node in image.nodes if node.href]
     if not href_nodes:
         return
@@ -154,27 +135,24 @@ def create_maptag(self, image, width_ratio, height_ratio):
     self.body.append('</map>')
 
 
-def render_dot_html(self, node, options):
-    format = self.builder.config.blockdiag_html_image_format
-    relfn, outfn = get_image_filename(self, node, format)
-
-    options['current_docname'] = self.builder.current_docname
-    image = create_blockdiag(self, node['code'], format, outfn, options)
-
-    if not os.path.isfile(outfn):
+def html_render_png(self, node):
+    image = node.to_drawer('PNG', self.builder)
+    if not os.path.isfile(image.filename):
         image.draw()
         image.save()
 
     # align
     if 'align' in node['options']:
-        self.body.append('<div align="%s" class="align-%s">' % (options['align'], options['align']))
+        align = node['options']['align']
+        self.body.append('<div align="%s" class="align-%s">' % (align, align))
         self.context.append('</div>\n')
     else:
         self.context.append('')
 
     # link to original image
+    relpath = node.get_relpath('PNG', self.builder)
     if 'width' in node['options'] or 'height' in node['options'] or 'scale' in node['options']:
-        self.body.append('<a class="reference internal image-reference" href="%s">' % relfn)
+        self.body.append('<a class="reference internal image-reference" href="%s">' % relpath)
         self.context.append('</a>')
     else:
         self.context.append('')
@@ -182,7 +160,7 @@ def render_dot_html(self, node, options):
     # <img> tag
     original_size = image.pagesize()
     resized = original_size.resize(**node['options'])
-    img_attr = dict(src=relfn,
+    img_attr = dict(src=relpath,
                     width=resized.width,
                     height=resized.height)
 
@@ -191,7 +169,7 @@ def render_dot_html(self, node, options):
 
         width_ratio = float(resized.width) / original_size.width
         height_ratio = float(resized.height) / original_size.height
-        create_maptag(self, image, width_ratio, height_ratio)
+        html_render_clickablemap(self, image, width_ratio, height_ratio)
 
     if 'alt' in node['options']:
         img_attr['alt'] = node['options']['alt']
@@ -203,15 +181,21 @@ def html_visit_blockdiag(self, node):
     try:
         image_format = get_image_format_for(self.builder)
         if image_format.upper() == 'SVG':
-            render_svg(self, node)
+            html_render_svg(self, node)
         else:
-            render_dot_html(self, node, node['options'])
+            html_render_png(self, node)
     except UnicodeEncodeError:
+        if self.builder.config.blockdiag_debug:
+            traceback.print_exc()
+
         msg = ("blockdiag error: UnicodeEncodeError caught "
                "(check your font settings)")
         self.builder.warn(msg)
         raise nodes.SkipNode
     except Exception as exc:
+        if self.builder.config.blockdiag_debug:
+            traceback.print_exc()
+
         self.builder.warn('dot code %r: %s' % (node['code'], str(exc)))
         raise nodes.SkipNode
 
@@ -278,32 +262,35 @@ def on_doctree_resolved(self, doctree, docname):
     try:
         image_format = get_image_format_for(self.builder)
     except Exception as exc:
+        if self.builder.config.blockdiag_debug:
+            traceback.print_exc()
+
         self.builder.warn('blockdiag error: %s' % exc)
-        for node in doctree.traverse(blockdiag.utils.rst.nodes.blockdiag):
+        for node in doctree.traverse(blockdiag_node):
             node.parent.remove(node)
 
         return
 
-    for node in doctree.traverse(blockdiag.utils.rst.nodes.blockdiag):
+    for node in doctree.traverse(blockdiag_node):
         try:
-            code = node['code']
-            options = node['options']
-            relfn, outfn = get_image_filename(self, node, image_format)
-
-            image = create_blockdiag(self, code, image_format, outfn, options)
-            if not os.path.isfile(outfn):
+            relfn = node.get_relpath(image_format, self.builder)
+            image = node.to_drawer(image_format, self.builder)
+            if not os.path.isfile(image.filename):
                 image.draw()
                 image.save()
 
-            image = nodes.image(uri=outfn, candidates={'*': relfn}, **options)
+            image = nodes.image(uri=image.filename, candidates={'*': relfn}, **node['options'])
             node.parent.replace(node, image)
         except Exception as exc:
+            if self.builder.config.blockdiag_debug:
+                traceback.print_exc()
+
             self.builder.warn('dot code %r: %s' % (node['code'], str(exc)))
             node.parent.remove(node)
 
 
 def setup(app):
-    app.add_node(blockdiag.utils.rst.nodes.blockdiag,
+    app.add_node(blockdiag_node,
                  html=(html_visit_blockdiag, html_depart_blockdiag))
     app.add_directive('blockdiag', Blockdiag)
     app.add_config_value('blockdiag_fontpath', None, 'html')
