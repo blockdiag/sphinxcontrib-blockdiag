@@ -50,7 +50,7 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
                        fontmap=builder.config.blockdiag_fontmap,
                        format=image_format)
         outputdir = getattr(builder, 'imgpath', builder.outdir)
-        return self.get_path(outputdir=outputdir, **options)
+        return os.path.join(outputdir, self.get_path(**options))
 
     def get_abspath(self, image_format, builder):
         options = dict(antialias=builder.config.blockdiag_antialias,
@@ -62,7 +62,7 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
             outputdir = os.path.join(builder.outdir, '_images')
         else:
             outputdir = builder.outdir
-        path = self.get_path(outputdir=outputdir, **options)
+        path = os.path.join(outputdir, self.get_path(**options))
         ensuredir(os.path.dirname(path))
 
         return path
