@@ -212,7 +212,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<svg .*?>')
+            self.assertRegexpMatches(source, '<div><svg .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
     def test_width_option_on_svg(self, app):
@@ -225,7 +225,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<svg height="60.0" viewBox="0 0 448 120" width="224.0" .*?>')
+            self.assertRegexpMatches(source, '<div><svg height="60.0" viewBox="0 0 448 120" width="224.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
     def test_height_option_on_svg(self, app):
@@ -238,7 +238,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<svg height="240.0" viewBox="0 0 448 120" width="896.0" .*?>')
+            self.assertRegexpMatches(source, '<div><svg height="240.0" viewBox="0 0 448 120" width="896.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
     def test_width_option_and_height_option_on_svg(self, app):
@@ -252,7 +252,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<svg height="200.0" viewBox="0 0 448 120" width="100.0" .*?>')
+            self.assertRegexpMatches(source, '<div><svg height="200.0" viewBox="0 0 448 120" width="100.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
     def test_scale_option_on_svg(self, app):
@@ -265,7 +265,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<svg height="30.0" viewBox="0 0 448 120" width="112.0" .*?>')
+            self.assertRegexpMatches(source, '<div><svg height="30.0" viewBox="0 0 448 120" width="112.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
     def test_width_option_and_scale_option_on_svg(self, app):
@@ -279,7 +279,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<svg height="1.875" viewBox="0 0 448 120" width="7.0" .*?>')
+            self.assertRegexpMatches(source, '<div><svg height="1.875" viewBox="0 0 448 120" width="7.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
     def test_align_option_on_svg(self, app):
@@ -305,7 +305,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<span id="target"></span><svg .*?>')
+            self.assertRegexpMatches(source, '<div><span id="target"></span><svg .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
     def test_reftarget_in_href_on_svg(self, app):
