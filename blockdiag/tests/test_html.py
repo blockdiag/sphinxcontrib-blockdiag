@@ -33,7 +33,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<img .*? src=".*?.png" .*?/>')
+            self.assertRegexpMatches(source, '<div><img .*? src=".*?.png" .*?/></div>')
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_width_option_on_png(self, app):
@@ -46,8 +46,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, ('<a class="reference internal image-reference" href="(.*?.png)">'
-                                              '<img height="60.0" src="\\1" width="224.0" /></a>'))
+            self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+                                              '<img height="60.0" src="\\1" width="224.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_height_option_on_png(self, app):
@@ -60,8 +60,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, ('<a class="reference internal image-reference" href="(.*?.png)">'
-                                              '<img height="240.0" src="\\1" width="896.0" /></a>'))
+            self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+                                              '<img height="240.0" src="\\1" width="896.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_width_option_and_height_option_on_png(self, app):
@@ -75,8 +75,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, ('<a class="reference internal image-reference" href="(.*?.png)">'
-                                              '<img height="200.0" src="\\1" width="100.0" /></a>'))
+            self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+                                              '<img height="200.0" src="\\1" width="100.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_scale_option_on_png(self, app):
@@ -89,8 +89,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, ('<a class="reference internal image-reference" href="(.*?.png)">'
-                                              '<img height="30.0" src="\\1" width="112.0" /></a>'))
+            self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+                                              '<img height="30.0" src="\\1" width="112.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_width_option_and_scale_option_on_png(self, app):
@@ -104,8 +104,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, ('<a class="reference internal image-reference" href="(.*?.png)">'
-                                              '<img height="1.875" src="\\1" width="7.0" /></a>'))
+            self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+                                              '<img height="1.875" src="\\1" width="7.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_align_option_on_png(self, app):
@@ -147,7 +147,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, '<img .*? id="target" src=".*?" .*? />')
+            self.assertRegexpMatches(source, '<div><img .*? id="target" src=".*?" .*? /></div>')
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_name_option_and_width_option_on_png(self, app):
@@ -161,8 +161,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, ('<a class="reference internal image-reference" href="(.*?.png)">'
-                                              '<img height="60.0" id="target" src="\\1" width="224.0" /></a>'))
+            self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+                                              '<img height="60.0" id="target" src="\\1" width="224.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_href_and_scale_option_on_png(self, app):
@@ -176,11 +176,11 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, ('<a class="reference internal image-reference" href="(.*?.png)">'
+            self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
                                               '<map name="(map_\d+)">'
                                               '<area shape="rect" coords="32.0,20.0,96.0,40.0" '
                                               'href="http://blockdiag.com/"></map>'
-                                              '<img .*? src="\\1" usemap="#\\2" .*?/></a>'))
+                                              '<img .*? src="\\1" usemap="#\\2" .*?/></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
     def test_reftarget_in_href_on_png(self, app):
@@ -198,9 +198,9 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         filename = os.path.join(app.outdir, 'index.html')
         with open(filename) as fd:
             source = fd.read()
-            self.assertRegexpMatches(source, ('<map name="(map_\d+)">'
+            self.assertRegexpMatches(source, ('<div><map name="(map_\d+)">'
                                               '<area shape="rect" coords="64.0,40.0,192.0,80.0" href="#target"></map>'
-                                              '<img .*? src=".*?.png" usemap="#\\1" .*?/>'))
+                                              '<img .*? src=".*?.png" usemap="#\\1" .*?/></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
     def test_build_svg_image(self, app):

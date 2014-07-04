@@ -147,7 +147,8 @@ def html_render_png(self, node):
         self.body.append('<div align="%s" class="align-%s">' % (align, align))
         self.context.append('</div>\n')
     else:
-        self.context.append('')
+        self.body.append('<div>')
+        self.context.append('</div>')
 
     # link to original image
     relpath = node.get_relpath('PNG', self.builder)
