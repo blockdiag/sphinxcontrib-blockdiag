@@ -104,7 +104,8 @@ def html_render_svg(self, node):
         self.body.append('<div align="%s" class="align-%s">' % (align, align))
         self.context.append('</div>\n')
     else:
-        self.context.append('')
+        self.body.append('<div>')
+        self.context.append('</div>\n')
 
     # reftarget
     for node_id in node['ids']:
