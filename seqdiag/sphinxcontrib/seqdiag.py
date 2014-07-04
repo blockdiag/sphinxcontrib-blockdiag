@@ -10,92 +10,238 @@
     :license: BSDL.
 """
 
-import io
+from __future__ import absolute_import
+
 import os
-import posixpath
+import re
 import traceback
 from collections import namedtuple
-try:
-    from hashlib import sha1 as sha
-except ImportError:
-    from sha import sha
-
 from docutils import nodes
-from sphinx.errors import SphinxError
 from sphinx.util.osutil import ensuredir
 
-import seqdiag_sphinxhelper as seqdiag
+import seqdiag.utils.rst.nodes
+import seqdiag.utils.rst.directives
+from blockdiag.utils.bootstrap import detectfont
+from blockdiag.utils.compat import u
+from blockdiag.utils.fontmap import FontMap
+
+# fontconfig; it will be initialized on `builder-inited` event.
+fontmap = None
 
 
-class SeqdiagError(SphinxError):
-    category = 'Seqdiag error'
+class seqdiag_node(seqdiag.utils.rst.nodes.seqdiag):
+    def to_drawer(self, image_format, builder, **kwargs):
+        if 'filename' in kwargs:
+            filename = kwargs.pop('filename')
+        else:
+            filename = self.get_abspath(image_format, builder)
+
+        antialias = builder.config.seqdiag_antialias
+        image = super(seqdiag_node, self).to_drawer(image_format, filename, fontmap,
+                                                    antialias=antialias, **kwargs)
+        for node in image.diagram.traverse_nodes():
+            node.href = resolve_reference(builder, node.href)
+
+        return image
+
+    def get_relpath(self, image_format, builder):
+        options = dict(antialias=builder.config.seqdiag_antialias,
+                       fontpath=builder.config.seqdiag_fontpath,
+                       fontmap=builder.config.seqdiag_fontmap,
+                       format=image_format)
+        outputdir = getattr(builder, 'imgpath', builder.outdir)
+        return os.path.join(outputdir, self.get_path(**options))
+
+    def get_abspath(self, image_format, builder):
+        options = dict(antialias=builder.config.seqdiag_antialias,
+                       fontpath=builder.config.seqdiag_fontpath,
+                       fontmap=builder.config.seqdiag_fontmap,
+                       format=image_format)
+
+        if hasattr(builder, 'imgpath'):
+            outputdir = os.path.join(builder.outdir, '_images')
+        else:
+            outputdir = builder.outdir
+        path = os.path.join(outputdir, self.get_path(**options))
+        ensuredir(os.path.dirname(path))
+
+        return path
 
 
 class Seqdiag(seqdiag.utils.rst.directives.SeqdiagDirective):
-    def run(self):
-        try:
-            return super(Seqdiag, self).run()
-        except seqdiag.core.parser.ParseException as e:
-            if self.content:
-                msg = '[%s] ParseError: %s\n%s' % (self.name, e, "\n".join(self.content))
-            else:
-                msg = '[%s] ParseError: %s\n%r' % (self.name, e, self.arguments[0])
-
-            reporter = self.state.document.reporter
-            return [reporter.warning(msg, line=self.lineno)]
+    node_class = seqdiag_node
 
     def node2image(self, node, diagram):
         return node
 
 
-def get_image_filename(self, code, format, options, prefix='seqdiag'):
-    """
-    Get path of output file.
-    """
-    if format.upper() not in ('PNG', 'PDF', 'SVG'):
-        raise SeqdiagError('seqdiag error:\nunknown format: %s\n' % format)
+def get_anchor(builder, refid):
+    for docname in builder.env.found_docs:
+        doctree = builder.env.get_doctree(docname)
+        for target in doctree.traverse(nodes.Targetable):
+            if target.attributes.get('refid') == refid:
+                targetfile = builder.get_relative_uri(builder.current_docname, docname)
+                return targetfile + "#" + refid
 
-    if format.upper() == 'PDF':
-        try:
-            import reportlab
-        except ImportError:
-            msg = 'seqdiag error:\n' + \
-                  'colud not output PDF format; Install reportlab\n'
-            raise SeqdiagError(msg)
 
-    hashkey = (code + str(options)).encode('utf-8')
-    fname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), format.lower())
-    if hasattr(self.builder, 'imgpath'):
-        # HTML
-        relfn = posixpath.join(self.builder.imgpath, fname)
-        outfn = os.path.join(self.builder.outdir, '_images', fname)
+def resolve_reference(builder, href):
+    if href is None:
+        return
+    pattern = re.compile(u("^:ref:`(.+?)`"), re.UNICODE)
+    matched = pattern.search(href)
+    if matched:
+        return get_anchor(builder, matched.group(1))
     else:
-        # LaTeX
-        relfn = fname
-        outfn = os.path.join(self.builder.outdir, fname)
-
-    if os.path.isfile(outfn):
-        return relfn, outfn
-
-    ensuredir(os.path.dirname(outfn))
-
-    return relfn, outfn
+        return href
 
 
-def get_fontmap(self):
-    FontMap = seqdiag.utils.fontmap.FontMap
+def html_render_svg(self, node):
+    image = node.to_drawer('SVG', self.builder, filename=None, nodoctype=True)
+    image.draw()
+
+    if 'align' in node['options']:
+        align = node['options']['align']
+        self.body.append('<div align="%s" class="align-%s">' % (align, align))
+        self.context.append('</div>\n')
+    else:
+        self.body.append('<div>')
+        self.context.append('</div>')
+
+    # reftarget
+    for node_id in node['ids']:
+        self.body.append('<span id="%s"></span>' % node_id)
+
+    # resize image
+    size = image.pagesize().resize(**node['options'])
+    self.body.append(image.save(size))
+    self.context.append('')
+
+
+def html_render_clickablemap(self, image, width_ratio, height_ratio):
+    href_nodes = [node for node in image.nodes if node.href]
+    if not href_nodes:
+        return
+
+    self.body.append('<map name="map_%d">' % id(image))
+    for node in href_nodes:
+        x1, y1, x2, y2 = image.metrics.cell(node)
+
+        x1 *= width_ratio
+        x2 *= width_ratio
+        y1 *= height_ratio
+        y2 *= height_ratio
+        areatag = '<area shape="rect" coords="%s,%s,%s,%s" href="%s">' % (x1, y1, x2, y2, node.href)
+        self.body.append(areatag)
+
+    self.body.append('</map>')
+
+
+def html_render_png(self, node):
+    image = node.to_drawer('PNG', self.builder)
+    if not os.path.isfile(image.filename):
+        image.draw()
+        image.save()
+
+    # align
+    if 'align' in node['options']:
+        align = node['options']['align']
+        self.body.append('<div align="%s" class="align-%s">' % (align, align))
+        self.context.append('</div>\n')
+    else:
+        self.body.append('<div>')
+        self.context.append('</div>')
+
+    # link to original image
+    relpath = node.get_relpath('PNG', self.builder)
+    if 'width' in node['options'] or 'height' in node['options'] or 'scale' in node['options']:
+        self.body.append('<a class="reference internal image-reference" href="%s">' % relpath)
+        self.context.append('</a>')
+    else:
+        self.context.append('')
+
+    # <img> tag
+    original_size = image.pagesize()
+    resized = original_size.resize(**node['options'])
+    img_attr = dict(src=relpath,
+                    width=resized.width,
+                    height=resized.height)
+
+    if any(node.href for node in image.nodes):
+        img_attr['usemap'] = "#map_%d" % id(image)
+
+        width_ratio = float(resized.width) / original_size.width
+        height_ratio = float(resized.height) / original_size.height
+        html_render_clickablemap(self, image, width_ratio, height_ratio)
+
+    if 'alt' in node['options']:
+        img_attr['alt'] = node['options']['alt']
+
+    self.body.append(self.starttag(node, 'img', '', empty=True, **img_attr))
+
+
+def html_visit_seqdiag(self, node):
+    try:
+        image_format = get_image_format_for(self.builder)
+        if image_format.upper() == 'SVG':
+            html_render_svg(self, node)
+        else:
+            html_render_png(self, node)
+    except UnicodeEncodeError:
+        if self.builder.config.seqdiag_debug:
+            traceback.print_exc()
+
+        msg = ("seqdiag error: UnicodeEncodeError caught "
+               "(check your font settings)")
+        self.builder.warn(msg)
+        raise nodes.SkipNode
+    except Exception as exc:
+        if self.builder.config.seqdiag_debug:
+            traceback.print_exc()
+
+        self.builder.warn('dot code %r: %s' % (node['code'], str(exc)))
+        raise nodes.SkipNode
+
+
+def html_depart_seqdiag(self, node):
+    self.body.append(self.context.pop())
+    self.body.append(self.context.pop())
+
+
+def get_image_format_for(builder):
+    if builder.format == 'html':
+        image_format = builder.config.seqdiag_html_image_format.upper()
+    elif builder.format == 'latex':
+        if builder.config.seqdiag_tex_image_format:
+            image_format = builder.config.seqdiag_tex_image_format.upper()
+        else:
+            image_format = builder.config.seqdiag_latex_image_format.upper()
+    else:
+        image_format = 'PNG'
+
+    if image_format.upper() not in ('PNG', 'PDF', 'SVG'):
+        raise ValueError('unknown format: %s' % image_format)
+
+    if image_format.upper() == 'PDF':
+        try:
+            import reportlab  # NOQA: importing test
+        except ImportError:
+            raise ImportError('Could not output PDF format. Install reportlab.')
+
+    return image_format
+
+
+def on_builder_inited(self):
+    # show deprecated message
+    if self.builder.config.seqdiag_tex_image_format:
+        self.builder.warn('seqdiag_tex_image_format is deprecated. Use seqdiag_latex_image_format.')
+
+    # initialize fontmap
+    global fontmap
 
     try:
         fontmappath = self.builder.config.seqdiag_fontmap
         fontmap = FontMap(fontmappath)
     except:
-        attrname = '_seqdiag_fontmap_warned'
-        if not hasattr(self.builder, attrname):
-            msg = ('seqdiag cannot load "%s" as fontmap file, '
-                   'check the seqdiag_fontmap setting' % fontmappath)
-            self.builder.warn(msg)
-            setattr(self.builder, attrname, True)
-
         fontmap = FontMap(None)
 
     try:
@@ -105,182 +251,56 @@ def get_fontmap(self):
 
         if fontpath:
             config = namedtuple('Config', 'font')(fontpath)
-            _fontpath = seqdiag.utils.bootstrap.detectfont(config)
-            fontmap.set_default_font(_fontpath)
+            fontpath = detectfont(config)
+            fontmap.set_default_font(fontpath)
     except:
-        attrname = '_seqdiag_fontpath_warned'
-        if not hasattr(self.builder, attrname):
-            msg = ('seqdiag cannot load "%s" as truetype font, '
-                   'check the seqdiag_fontpath setting' % fontpath)
-            self.builder.warn(msg)
-            setattr(self.builder, attrname, True)
-
-    return fontmap
-
-
-def create_seqdiag(self, code, format, filename, options, prefix='seqdiag'):
-    """
-    Render seqdiag code into a PNG output file.
-    """
-    draw = None
-    fontmap = get_fontmap(self)
-    try:
-        tree = seqdiag.core.parser.parse_string(code)
-        diagram = seqdiag.core.builder.ScreenNodeBuilder.build(tree)
-
-        antialias = self.builder.config.seqdiag_antialias
-        draw = seqdiag.core.drawer.DiagramDraw(format, diagram, filename,
-                                               fontmap=fontmap, antialias=antialias)
-    except Exception as e:
-        if self.builder.config.seqdiag_debug:
-            traceback.print_exc()
-
-        raise SeqdiagError('seqdiag error:\n%s\n' % e)
-
-    return draw
-
-
-def make_svgtag(self, image, relfn, trelfn, outfn,
-                alt, thumb_size, image_size):
-    svgtag_format = """<svg xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    alt="%s" width="%s" height="%s">%s
-    </svg>"""
-
-    code = io.open(outfn, 'r', encoding='utf-8-sig').read()
-
-    return (svgtag_format %
-            (alt, image_size[0], image_size[1], code))
-
-
-def make_imgtag(self, image, relfn, trelfn, outfn,
-                alt, thumb_size, image_size):
-    result = ""
-    imgtag_format = '<img src="%s" alt="%s" width="%s" height="%s" />\n'
-
-    if trelfn:
-        result += ('<a href="%s">' % relfn)
-        result += (imgtag_format %
-                   (trelfn, alt, thumb_size[0], thumb_size[1]))
-        result += ('</a>')
-    else:
-        result += (imgtag_format %
-                   (relfn, alt, image_size[0], image_size[1]))
-
-    return result
-
-
-def render_dot_html(self, node, code, options, prefix='seqdiag',
-                    imgcls=None, alt=None):
-    trelfn = None
-    thumb_size = None
-    try:
-        format = self.builder.config.seqdiag_html_image_format
-        relfn, outfn = get_image_filename(self, code, format, options, prefix)
-
-        image = create_seqdiag(self, code, format, outfn, options, prefix)
-        if not os.path.isfile(outfn):
-            image.draw()
-            image.save()
-
-        # generate thumbnails
-        image_size = image.pagesize()
-        if 'maxwidth' in options and options['maxwidth'] < image_size[0]:
-            thumb_prefix = prefix + '_thumb'
-            trelfn, toutfn = get_image_filename(self, code, format,
-                                                options, thumb_prefix)
-
-            ratio = float(options['maxwidth']) / image_size[0]
-            thumb_size = (options['maxwidth'], image_size[1] * ratio)
-            if not os.path.isfile(toutfn):
-                image.filename = toutfn
-                image.save(thumb_size)
-
-    except UnicodeEncodeError:
-        msg = ("seqdiag error: UnicodeEncodeError caught "
-               "(check your font settings)")
-        self.builder.warn(msg)
-        raise nodes.SkipNode
-    except SeqdiagError as exc:
-        self.builder.warn('dot code %r: ' % code + str(exc))
-        raise nodes.SkipNode
-
-    self.body.append(self.starttag(node, 'p', CLASS='seqdiag'))
-    if relfn is None:
-        self.body.append(self.encode(code))
-    else:
-        if alt is None:
-            alt = node.get('alt', self.encode(code).strip())
-
-        if format.upper() == 'SVG':
-            tagfunc = make_svgtag
-        else:
-            tagfunc = make_imgtag
-
-        self.body.append(tagfunc(self, image, relfn, trelfn, outfn, alt,
-                                 thumb_size, image_size))
-
-    self.body.append('</p>\n')
-    raise nodes.SkipNode
-
-
-def html_visit_seqdiag(self, node):
-    render_dot_html(self, node, node['code'], node['options'])
-
-
-def render_dot_latex(self, node, code, options, prefix='seqdiag'):
-    try:
-        format = self.builder.config.seqdiag_tex_image_format
-        fname, outfn = get_image_filename(self, code, format, options, prefix)
-
-        image = create_seqdiag(self, code, format, outfn, options, prefix)
-        if not os.path.isfile(outfn):
-            image.draw()
-            image.save()
-
-    except SeqdiagError as exc:
-        self.builder.warn('dot code %r: ' % code + str(exc))
-        raise nodes.SkipNode
-
-    if fname is not None:
-        self.body.append('\\par\\includegraphics{%s}\\par' % fname)
-    raise nodes.SkipNode
-
-
-def latex_visit_seqdiag(self, node):
-    render_dot_latex(self, node, node['code'], node['options'])
+        pass
 
 
 def on_doctree_resolved(self, doctree, docname):
-    if self.builder.format in ('html', 'latex'):
+    if self.builder.format == 'html':
         return
 
-    for node in doctree.traverse(seqdiag.utils.rst.nodes.seqdiag):
-        code = node['code']
-        prefix = 'seqdiag'
-        format = 'PNG'
-        options = node['options']
-        relfn, outfn = get_image_filename(self, code, format, options, prefix)
+    try:
+        image_format = get_image_format_for(self.builder)
+    except Exception as exc:
+        if self.builder.config.seqdiag_debug:
+            traceback.print_exc()
 
-        image = create_seqdiag(self, code, format, outfn, options, prefix)
-        if not os.path.isfile(outfn):
-            image.draw()
-            image.save()
+        self.builder.warn('seqdiag error: %s' % exc)
+        for node in doctree.traverse(seqdiag_node):
+            node.parent.remove(node)
 
-        candidates = {'image/png': relfn}
-        image = nodes.image(uri=outfn, candidates=candidates)
-        node.parent.replace(node, image)
+        return
+
+    for node in doctree.traverse(seqdiag_node):
+        try:
+            relfn = node.get_relpath(image_format, self.builder)
+            image = node.to_drawer(image_format, self.builder)
+            if not os.path.isfile(image.filename):
+                image.draw()
+                image.save()
+
+            image = nodes.image(uri=image.filename, candidates={'*': relfn}, **node['options'])
+            node.parent.replace(node, image)
+        except Exception as exc:
+            if self.builder.config.seqdiag_debug:
+                traceback.print_exc()
+
+            self.builder.warn('dot code %r: %s' % (node['code'], str(exc)))
+            node.parent.remove(node)
 
 
 def setup(app):
-    app.add_node(seqdiag.utils.rst.nodes.seqdiag,
-                 html=(html_visit_seqdiag, None),
-                 latex=(latex_visit_seqdiag, None))
+    app.add_node(seqdiag_node,
+                 html=(html_visit_seqdiag, html_depart_seqdiag))
     app.add_directive('seqdiag', Seqdiag)
     app.add_config_value('seqdiag_fontpath', None, 'html')
     app.add_config_value('seqdiag_fontmap', None, 'html')
     app.add_config_value('seqdiag_antialias', False, 'html')
     app.add_config_value('seqdiag_debug', False, 'html')
     app.add_config_value('seqdiag_html_image_format', 'PNG', 'html')
-    app.add_config_value('seqdiag_tex_image_format', 'PNG', 'html')
+    app.add_config_value('seqdiag_tex_image_format', None, 'html')  # backward compatibility for 0.6.1
+    app.add_config_value('seqdiag_latex_image_format', 'PNG', 'html')
+    app.connect("builder-inited", on_builder_inited)
     app.connect("doctree-resolved", on_doctree_resolved)

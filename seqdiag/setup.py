@@ -21,7 +21,7 @@ Following code is sample::
 This module needs seqdiag_.
 '''
 
-requires = ['seqdiag>=0.9.0', 'Sphinx>=0.6', 'setuptools']
+requires = ['seqdiag>=0.9.3', 'Sphinx>=0.6', 'setuptools']
 
 setup(
     name='sphinxcontrib-seqdiag',
