@@ -53,6 +53,8 @@ List of extensions
 - domaintools_: A tool for easy domain creation.
 - email: obfuscate email addresses
 - erlangdomain: an extension for Erlang support (Sphinx 1.0 needed)
+- examplecode: this extension adds support for a multiple language code block
+  widget to Sphinx_.
 - exceltable: embed Excel spreadsheets into documents using exceltable_
 - feed: an extension for creating syndication feeds and time-based overviews
   from your site content
