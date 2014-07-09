@@ -3,6 +3,7 @@
 import os
 import sys
 import tempfile
+from mock import Mock
 from functools import wraps
 from sphinx.application import Sphinx
 
@@ -126,6 +127,7 @@ def with_built_docstring(**sphinxargs):
                 fd.write('heading\n')
                 fd.write('=======\n')
                 fd.write(trim_docstring(func.__doc__))
+            app.builder.warn = Mock()
             app.builder.build_all()
             func(*args)
 
