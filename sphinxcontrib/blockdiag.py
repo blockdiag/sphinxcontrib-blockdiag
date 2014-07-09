@@ -17,6 +17,7 @@ import re
 import traceback
 from collections import namedtuple
 from docutils import nodes
+from sphinx import addnodes
 from sphinx.util.osutil import ensuredir
 
 import blockdiag.utils.rst.nodes
@@ -75,24 +76,28 @@ class Blockdiag(blockdiag.utils.rst.directives.BlockdiagDirective):
         return node
 
 
-def get_anchor(builder, refid):
-    for docname in builder.env.found_docs:
-        doctree = builder.env.get_doctree(docname)
-        for target in doctree.traverse(nodes.Targetable):
-            if target.attributes.get('refid') == refid:
-                targetfile = builder.get_relative_uri(builder.current_docname, docname)
-                return targetfile + "#" + refid
-
-
 def resolve_reference(builder, href):
     if href is None:
-        return
+        return None
+
     pattern = re.compile(u("^:ref:`(.+?)`"), re.UNICODE)
     matched = pattern.search(href)
-    if matched:
-        return get_anchor(builder, matched.group(1))
-    else:
+    if matched is None:
         return href
+    else:
+        refid = matched.group(1)
+        domain = builder.env.domains['std']
+        node = addnodes.pending_xref(refexplicit=False)
+        xref = domain.resolve_xref(builder.env, builder.current_docname, builder,
+                                   'ref', refid, node, node)
+        if xref:
+            if 'refid' in xref:
+                return "#" + xref['refid']
+            else:
+                return xref['refuri']
+        else:
+            builder.warn('undefined label: %s' % refid)
+            return None
 
 
 def html_render_svg(self, node):
