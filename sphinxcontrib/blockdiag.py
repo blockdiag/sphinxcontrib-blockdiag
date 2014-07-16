@@ -23,7 +23,7 @@ from sphinx.util.osutil import ensuredir
 import blockdiag.utils.rst.nodes
 import blockdiag.utils.rst.directives
 from blockdiag.utils.bootstrap import detectfont
-from blockdiag.utils.compat import u
+from blockdiag.utils.compat import u, string_types
 from blockdiag.utils.fontmap import FontMap
 
 # fontconfig; it will be initialized on `builder-inited` event.
@@ -251,7 +251,7 @@ def on_builder_inited(self):
 
     try:
         fontpath = self.builder.config.blockdiag_fontpath
-        if isinstance(fontpath, blockdiag.utils.compat.string_types):
+        if isinstance(fontpath, string_types):
             fontpath = [fontpath]
 
         if fontpath:
