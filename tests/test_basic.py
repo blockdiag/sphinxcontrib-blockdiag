@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from utils import with_app
+from .utils import with_app
 
 
 @with_app(buildername='html', srcdir='docs/basic/')
