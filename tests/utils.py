@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import io
 import os
 import sys
 import tempfile
@@ -54,7 +55,7 @@ class FakeSphinx(Sphinx):
             srcdir = tempfile.mkdtemp()
             self.cleanup_dirs.append(srcdir)
 
-            open(os.path.join(srcdir, 'conf.py'), 'w').close()
+            io.open(os.path.join(srcdir, 'conf.py'), 'w', encoding='utf-8').close()
         else:
             self.readonly = True
             if not srcdir.startswith('/'):
