@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import io
 import os
 import re
 from .utils import with_built_docstring
@@ -43,7 +44,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
 
@@ -57,7 +58,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.pdf}')
 
@@ -71,7 +72,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.pdf}')
 
@@ -84,7 +85,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/blockdiag-.*?.png}')
 
@@ -97,7 +98,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/blockdiag-.*?.png}')
 
@@ -110,7 +111,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/blockdiag-.*?.png}}')
 
@@ -123,7 +124,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/blockdiag-.*?.png}\\\\hfill}')
 
@@ -136,7 +137,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/blockdiag-.*?.png}\\\\hfill}')
 
@@ -149,7 +150,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/blockdiag-.*?.png}}')
 
@@ -162,7 +163,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
 
@@ -180,7 +181,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
 

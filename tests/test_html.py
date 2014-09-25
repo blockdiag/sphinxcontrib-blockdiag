@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import io
 import os
 import re
 from .utils import with_built_docstring
@@ -31,7 +32,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><img .*? src=".*?.png" .*?/></div>')
 
@@ -44,7 +45,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
                                               '<img height="60.0" src="\\1" width="224.0" /></a></div>'))
@@ -58,7 +59,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
                                               '<img height="240.0" src="\\1" width="896.0" /></a></div>'))
@@ -73,7 +74,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
                                               '<img height="200.0" src="\\1" width="100.0" /></a></div>'))
@@ -87,7 +88,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
                                               '<img height="30.0" src="\\1" width="112.0" /></a></div>'))
@@ -102,7 +103,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
                                               '<img height="1.875" src="\\1" width="7.0" /></a></div>'))
@@ -116,7 +117,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div align="center" class="align-center"><img .*? /></div>')
 
@@ -130,7 +131,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div align="center" class="align-center">'
                                               '<a class="reference internal image-reference" href="(.*?.png)">'
@@ -145,7 +146,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><img .*? id="target" src=".*?" .*? /></div>')
 
@@ -159,7 +160,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
                                               '<img height="60.0" id="target" src="\\1" width="224.0" /></a></div>'))
@@ -174,7 +175,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A [href = 'http://blockdiag.com/'];
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
                                               '<map name="(map_\d+)">'
@@ -196,7 +197,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A [href = ':ref:`target`'];
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><map name="(map_\d+)">'
                                               '<area shape="rect" coords="64.0,40.0,192.0,80.0" href="#target"></map>'
@@ -216,7 +217,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A [href = ':ref:`hello world`'];
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><map name="(map_\d+)">'
                                               '<area shape="rect" coords="64.0,40.0,192.0,80.0" href="#hello-world">'
@@ -231,7 +232,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A [href = ':ref:`unknown_target`'];
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><img .*? src=".*?.png" .*?/></div>'))
             self.assertIn('undefined label: unknown_target',
@@ -245,7 +246,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><svg .*?>')
 
@@ -258,7 +259,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><svg height="60.0" viewBox="0 0 448 120" width="224.0" .*?>')
 
@@ -271,7 +272,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><svg height="240.0" viewBox="0 0 448 120" width="896.0" .*?>')
 
@@ -285,7 +286,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><svg height="200.0" viewBox="0 0 448 120" width="100.0" .*?>')
 
@@ -298,7 +299,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><svg height="30.0" viewBox="0 0 448 120" width="112.0" .*?>')
 
@@ -312,7 +313,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><svg height="1.875" viewBox="0 0 448 120" width="7.0" .*?>')
 
@@ -325,7 +326,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div align="center" class="align-center"><svg .*?>')
 
@@ -338,7 +339,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A -> B;
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<div><span id="target"></span><svg .*?>')
 
@@ -356,7 +357,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A [href = ':ref:`target`'];
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<a xlink:href="#target">\\n\\s*<rect .*?>\\n\\s*</a>')
 
@@ -374,7 +375,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A [href = ':ref:`hello world`'];
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, '<a xlink:href="#hello-world">\\n\\s*<rect .*?>\\n\\s*</a>')
 
@@ -387,7 +388,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
            A [href = ':ref:`unknown_target`'];
         """
         filename = os.path.join(app.outdir, 'index.html')
-        with open(filename) as fd:
+        with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             if sys.version_info < (3, 0):
                 self.assertNotRegexpMatches(source, '<a xlink:href="#hello-world">\\n\\s*<rect .*?>\\n\\s*</a>')
