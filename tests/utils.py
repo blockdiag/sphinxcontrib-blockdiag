@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import io
 import os
 import sys
 import tempfile
+from mock import Mock
 from functools import wraps
 from sphinx.application import Sphinx
 
@@ -19,7 +21,7 @@ def trim_docstring(docstring):
     lines = docstring.expandtabs().splitlines()
 
     # Determine minimum indentation (first line doesn't count):
-    indent = sys.maxint
+    indent = sys.maxsize
     for line in lines[1:]:
         stripped = line.lstrip()
         if stripped:
@@ -27,7 +29,7 @@ def trim_docstring(docstring):
 
     # Remove indentation (first line is special):
     trimmed = [lines[0].strip()]
-    if indent < sys.maxint:
+    if indent < sys.maxsize:
         for line in lines[1:]:
             trimmed.append(line[indent:].rstrip())
 
@@ -53,7 +55,7 @@ class FakeSphinx(Sphinx):
             srcdir = tempfile.mkdtemp()
             self.cleanup_dirs.append(srcdir)
 
-            open(os.path.join(srcdir, 'conf.py'), 'w').close()
+            io.open(os.path.join(srcdir, 'conf.py'), 'w', encoding='utf-8').close()
         else:
             self.readonly = True
             if not srcdir.startswith('/'):
@@ -66,6 +68,7 @@ class FakeSphinx(Sphinx):
         outdir = os.path.join(self.builddir, str(buildername))
         doctreedir = os.path.join(self.builddir, 'doctrees')
 
+        os.mkdir(outdir)
         self.cleanup_dirs.append(self.builddir)
 
         # misc settings
@@ -111,6 +114,25 @@ def with_app(*sphinxargs, **sphinxkwargs):
                     app.cleanup()
         return decorator
 
+    return testcase
+
+
+def with_built_docstring(**sphinxargs):
+    def testcase(func):
+        @wraps(func)
+        @with_app(srcdir=None, **sphinxargs)
+        def decorator(*args):
+            app = args[-1]
+            index_rst = os.path.join(app.srcdir, 'index.rst')
+            with open(index_rst, 'wt') as fd:
+                fd.write('heading\n')
+                fd.write('=======\n')
+                fd.write(trim_docstring(func.__doc__))
+            app.builder.warn = Mock()
+            app.builder.build_all()
+            func(*args)
+
+        return decorator
     return testcase
 
 
