@@ -13,6 +13,21 @@ from sphinx.application import Sphinx
 testdir = os.path.dirname(__file__)
 
 
+if sphinx.__version__ < "1.2":
+    # Make extensions overridable on Sphinx < 1.2
+    from sphinx.config import Config
+
+    def make_extensions_overridable(fn):
+        @wraps(fn)
+        def decorator(self, dirname, filename, overrides, tags):
+            fn(self, dirname, filename, overrides, tags)
+            self.extensions += overrides.get('extensions', [])
+
+        return decorator
+
+    Config.__init__ = make_extensions_overridable(Config.__init__)
+
+
 def trim_docstring(docstring):
     """ from PEP-257 <http://www.python.org/dev/peps/pep-0257/> """
     if not docstring:
@@ -77,8 +92,12 @@ class FakeSphinx(Sphinx):
         status = sys.stdout
         warning = sys.stdout
 
+        extensions = confoverrides.get('extensions', [])
         Sphinx.__init__(self, srcdir, confdir, outdir, doctreedir,
                         buildername, dict(confoverrides), status, warning)
+
+        for ext in extensions:
+            self.setup_extension(ext)
 
     def __del__(self):
         self.cleanup()
