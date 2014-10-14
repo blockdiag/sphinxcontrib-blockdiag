@@ -6,6 +6,8 @@ import sys
 import tempfile
 from mock import Mock
 from functools import wraps
+
+import sphinx
 from sphinx.application import Sphinx
 
 testdir = os.path.dirname(__file__)
@@ -76,7 +78,7 @@ class FakeSphinx(Sphinx):
         warning = sys.stdout
 
         Sphinx.__init__(self, srcdir, confdir, outdir, doctreedir,
-                        buildername, confoverrides, status, warning)
+                        buildername, dict(confoverrides), status, warning)
 
     def __del__(self):
         self.cleanup()
@@ -93,10 +95,14 @@ class FakeSphinx(Sphinx):
         with open(os.path.join(self.srcdir, 'index.rst'), 'w') as fd:
             fd.write(trim_docstring(string))
 
-        msg, length, iterator = self.env.update(self.config, self.srcdir,
-                                                self.doctreedir, self)
-        for _ in iterator:
-            pass
+        if sphinx.__version__ < "1.3":
+            msg, length, iterator = self.env.update(self.config, self.srcdir,
+                                                    self.doctreedir, self)
+            for _ in iterator:
+                pass
+        else:
+            self.env.update(self.config, self.srcdir,
+                            self.doctreedir, self)
 
         return self.env.get_doctree('index').children
 
