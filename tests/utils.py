@@ -4,7 +4,6 @@ import io
 import os
 import sys
 import tempfile
-from mock import Mock
 from six import StringIO
 from functools import wraps
 
@@ -110,24 +109,6 @@ class FakeSphinx(Sphinx):
         for dir in self.cleanup_dirs:
             shutil.rmtree(dir, True)
 
-    def parse_string(self, string):
-        if self.readonly:
-            raise RuntimeError()
-
-        with open(os.path.join(self.srcdir, 'index.rst'), 'w') as fd:
-            fd.write(trim_docstring(string))
-
-        if sphinx.__version__ < "1.3":
-            msg, length, iterator = self.env.update(self.config, self.srcdir,
-                                                    self.doctreedir, self)
-            for _ in iterator:
-                pass
-        else:
-            self.env.update(self.config, self.srcdir,
-                            self.doctreedir, self)
-
-        return self.env.get_doctree('index').children
-
 
 def with_app(*sphinxargs, **sphinxkwargs):
     def testcase(func):
@@ -162,20 +143,4 @@ def with_built_docstring(**sphinxargs):
             func(*args)
 
         return decorator
-    return testcase
-
-
-def with_parsed(*sphinxargs, **sphinxkwargs):
-    def testcase(func):
-        @wraps(func)
-        def decorator(*args, **kwargs):
-            app = None
-            try:
-                app = FakeSphinx(*sphinxargs, **sphinxkwargs)
-                nodes = app.parse_string(func.__doc__)
-                func(*(args + (nodes,)), **kwargs)
-            finally:
-                app.cleanup()
-        return decorator
-
     return testcase

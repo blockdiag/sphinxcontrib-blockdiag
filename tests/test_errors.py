@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from mock import patch
-from .utils import FakeSphinx, with_app, with_parsed
+from .utils import FakeSphinx, with_app, with_built_docstring
 import sphinxcontrib.blockdiag
 from blockdiag.utils.compat import u
 
@@ -20,14 +20,14 @@ class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
     def tearDown(self):
         self.app.cleanup()
 
-    @with_parsed()
-    def test_parse_error(self, nodes):
+    @with_built_docstring(confoverrides=dict(master_doc='index', extensions=['sphinxcontrib.blockdiag']))
+    def test_parse_error(self, app, status, warning):
         """
         .. blockdiag::
 
            { A -> B;
         """
-        self.assertEqual([], nodes)
+        self.assertIn('got unexpected token:', warning.getvalue())
 
     @with_app(srcdir='docs/basic', confoverrides=dict(blockdiag_html_image_format='JPG'))
     def test_unknown_format_error(self, app, status, warning):
