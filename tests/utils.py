@@ -5,6 +5,7 @@ import os
 import sys
 import tempfile
 from mock import Mock
+from six import StringIO
 from functools import wraps
 
 import sphinx
@@ -63,7 +64,7 @@ def trim_docstring(docstring):
 class FakeSphinx(Sphinx):
     """ Sphinx application class for testing """
 
-    def __init__(self, srcdir=None, buildername='html', confoverrides={}):
+    def __init__(self, srcdir=None, buildername='html', confoverrides={}, status=None, warning=None):
         self.cleanup_dirs = []
         self.readonly = False
 
@@ -89,8 +90,10 @@ class FakeSphinx(Sphinx):
         self.cleanup_dirs.append(self.builddir)
 
         # misc settings
-        status = sys.stdout
-        warning = sys.stdout
+        if status is None:
+            status = sys.stdout
+        if warning is None:
+            warning = sys.stdout
 
         extensions = confoverrides.get('extensions', [])
         Sphinx.__init__(self, srcdir, confdir, outdir, doctreedir,
@@ -132,8 +135,10 @@ def with_app(*sphinxargs, **sphinxkwargs):
         def decorator(*args, **kwargs):
             app = None
             try:
+                status = sphinxkwargs.setdefault('status', StringIO())
+                warning = sphinxkwargs.setdefault('warning', StringIO())
                 app = FakeSphinx(*sphinxargs, **sphinxkwargs)
-                func(*(args + (app,)), **kwargs)
+                func(*(args + (app, status, warning)), **kwargs)
             finally:
                 if app:
                     app.cleanup()
@@ -147,13 +152,12 @@ def with_built_docstring(**sphinxargs):
         @wraps(func)
         @with_app(srcdir=None, **sphinxargs)
         def decorator(*args):
-            app = args[-1]
+            app = args[-3]
             index_rst = os.path.join(app.srcdir, 'index.rst')
             with open(index_rst, 'wt') as fd:
                 fd.write('heading\n')
                 fd.write('=======\n')
                 fd.write(trim_docstring(func.__doc__))
-            app.builder.warn = Mock()
             app.builder.build_all()
             func(*args)
 

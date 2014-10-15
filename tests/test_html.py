@@ -25,7 +25,7 @@ svg_config = dict(
 
 class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_build_png_image(self, app):
+    def test_build_png_image(self, app, status, warning):
         """
         .. blockdiag::
 
@@ -37,7 +37,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><img .*? src=".*?.png" .*?/></div>')
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_width_option_on_png(self, app):
+    def test_width_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :width: 224
@@ -51,7 +51,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img height="60.0" src="\\1" width="224.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_height_option_on_png(self, app):
+    def test_height_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :height: 240
@@ -65,7 +65,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img height="240.0" src="\\1" width="896.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_width_option_and_height_option_on_png(self, app):
+    def test_width_option_and_height_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :width: 100
@@ -80,7 +80,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img height="200.0" src="\\1" width="100.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_scale_option_on_png(self, app):
+    def test_scale_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :scale: 25%
@@ -94,7 +94,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img height="30.0" src="\\1" width="112.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_width_option_and_scale_option_on_png(self, app):
+    def test_width_option_and_scale_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :width: 28
@@ -109,7 +109,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img height="1.875" src="\\1" width="7.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_align_option_on_png(self, app):
+    def test_align_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :align: center
@@ -122,7 +122,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div align="center" class="align-center"><img .*? /></div>')
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_align_option_and_width_option_on_png(self, app):
+    def test_align_option_and_width_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :align: center
@@ -138,7 +138,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img height="60.0" src="\\1" width="224.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_name_option_on_png(self, app):
+    def test_name_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :name: target
@@ -151,7 +151,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><img .*? id="target" src=".*?" .*? /></div>')
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_name_option_and_width_option_on_png(self, app):
+    def test_name_option_and_width_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :name: target
@@ -166,7 +166,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img height="60.0" id="target" src="\\1" width="224.0" /></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_href_and_scale_option_on_png(self, app):
+    def test_href_and_scale_option_on_png(self, app, status, warning):
         """
         .. blockdiag::
            :scale: 50%
@@ -184,7 +184,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img .*? src="\\1" usemap="#\\2" .*?/></a></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_reftarget_in_href_on_png1(self, app):
+    def test_reftarget_in_href_on_png1(self, app, status, warning):
         """
         .. _target:
 
@@ -204,7 +204,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '<img .*? src=".*?.png" usemap="#\\1" .*?/></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_reftarget_in_href_on_png2(self, app):
+    def test_reftarget_in_href_on_png2(self, app, status, warning):
         """
         .. _hello world:
 
@@ -224,7 +224,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                                               '</map><img .*? src=".*?.png" usemap="#\\1" .*?/></div>'))
 
     @with_built_docstring(buildername='html', confoverrides=png_config)
-    def test_missing_reftarget_in_href_on_png(self, app):
+    def test_missing_reftarget_in_href_on_png(self, app, status, warning):
         """
         .. blockdiag::
 
@@ -235,11 +235,10 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         with io.open(filename, encoding='utf-8') as fd:
             source = fd.read()
             self.assertRegexpMatches(source, ('<div><img .*? src=".*?.png" .*?/></div>'))
-            self.assertIn('undefined label: unknown_target',
-                          app.builder.warn.call_args_list[0][0][0])
+            self.assertIn('undefined label: unknown_target', warning.getvalue())
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_build_svg_image(self, app):
+    def test_build_svg_image(self, app, status, warning):
         """
         .. blockdiag::
 
@@ -251,7 +250,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><svg .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_width_option_on_svg(self, app):
+    def test_width_option_on_svg(self, app, status, warning):
         """
         .. blockdiag::
            :width: 224
@@ -264,7 +263,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><svg height="60.0" viewBox="0 0 448 120" width="224.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_height_option_on_svg(self, app):
+    def test_height_option_on_svg(self, app, status, warning):
         """
         .. blockdiag::
            :height: 240
@@ -277,7 +276,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><svg height="240.0" viewBox="0 0 448 120" width="896.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_width_option_and_height_option_on_svg(self, app):
+    def test_width_option_and_height_option_on_svg(self, app, status, warning):
         """
         .. blockdiag::
            :width: 100
@@ -291,7 +290,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><svg height="200.0" viewBox="0 0 448 120" width="100.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_scale_option_on_svg(self, app):
+    def test_scale_option_on_svg(self, app, status, warning):
         """
         .. blockdiag::
            :scale: 25%
@@ -304,7 +303,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><svg height="30.0" viewBox="0 0 448 120" width="112.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_width_option_and_scale_option_on_svg(self, app):
+    def test_width_option_and_scale_option_on_svg(self, app, status, warning):
         """
         .. blockdiag::
            :width: 28
@@ -318,7 +317,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><svg height="1.875" viewBox="0 0 448 120" width="7.0" .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_align_option_on_svg(self, app):
+    def test_align_option_on_svg(self, app, status, warning):
         """
         .. blockdiag::
            :align: center
@@ -331,7 +330,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div align="center" class="align-center"><svg .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_name_option_on_svg(self, app):
+    def test_name_option_on_svg(self, app, status, warning):
         """
         .. blockdiag::
            :name: target
@@ -344,7 +343,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<div><span id="target"></span><svg .*?>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_reftarget_in_href_on_svg1(self, app):
+    def test_reftarget_in_href_on_svg1(self, app, status, warning):
         """
         .. _target:
 
@@ -362,7 +361,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<a xlink:href="#target">\\n\\s*<rect .*?>\\n\\s*</a>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_reftarget_in_href_on_svg2(self, app):
+    def test_reftarget_in_href_on_svg2(self, app, status, warning):
         """
         .. _hello world:
 
@@ -380,7 +379,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
             self.assertRegexpMatches(source, '<a xlink:href="#hello-world">\\n\\s*<rect .*?>\\n\\s*</a>')
 
     @with_built_docstring(buildername='html', confoverrides=svg_config)
-    def test_missing_reftarget_in_href_on_svg(self, app):
+    def test_missing_reftarget_in_href_on_svg(self, app, status, warning):
         """
         .. blockdiag::
 
@@ -394,5 +393,4 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
                 self.assertNotRegexpMatches(source, '<a xlink:href="#hello-world">\\n\\s*<rect .*?>\\n\\s*</a>')
             else:
                 self.assertNotRegex(source, '<a xlink:href="#hello-world">\\n\\s*<rect .*?>\\n\\s*</a>')
-            self.assertIn('undefined label: unknown_target',
-                          app.builder.warn.call_args_list[0][0][0])
+            self.assertIn('undefined label: unknown_target', warning.getvalue())

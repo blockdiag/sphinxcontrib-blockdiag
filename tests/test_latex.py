@@ -37,7 +37,7 @@ pdf_config_oldstyle = dict(
 
 class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_build_png_image(self, app):
+    def test_build_png_image(self, app, status, warning):
         """
         .. blockdiag::
 
@@ -51,7 +51,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
     @unittest.skipUnless(os.path.exists(pdf_config['blockdiag_fontpath']), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
     @with_built_docstring(buildername='latex', confoverrides=pdf_config)
-    def test_build_pdf_image1(self, app):
+    def test_build_pdf_image1(self, app, status, warning):
         """
         .. blockdiag::
 
@@ -65,7 +65,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
     @unittest.skipUnless(os.path.exists(pdf_config['blockdiag_fontpath']), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
     @with_built_docstring(buildername='latex', confoverrides=pdf_config_oldstyle)
-    def test_build_pdf_image2(self, app):
+    def test_build_pdf_image2(self, app, status, warning):
         """
         .. blockdiag::
 
@@ -77,7 +77,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
             self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.pdf}')
 
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_width_option(self, app):
+    def test_width_option(self, app, status, warning):
         """
         .. blockdiag::
            :width: 3cm
@@ -90,7 +90,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
             self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/blockdiag-.*?.png}')
 
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_height_option(self, app):
+    def test_height_option(self, app, status, warning):
         """
         .. blockdiag::
            :height: 4cm
@@ -103,7 +103,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
             self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/blockdiag-.*?.png}')
 
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_scale_option(self, app):
+    def test_scale_option(self, app, status, warning):
         """
         .. blockdiag::
            :scale: 50%
@@ -116,7 +116,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
             self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/blockdiag-.*?.png}}')
 
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_left(self, app):
+    def test_align_option_left(self, app, status, warning):
         """
         .. blockdiag::
            :align: left
@@ -129,7 +129,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
             self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/blockdiag-.*?.png}\\\\hfill}')
 
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_center(self, app):
+    def test_align_option_center(self, app, status, warning):
         """
         .. blockdiag::
            :align: center
@@ -142,7 +142,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
             self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/blockdiag-.*?.png}\\\\hfill}')
 
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_right(self, app):
+    def test_align_option_right(self, app, status, warning):
         """
         .. blockdiag::
            :align: right
@@ -155,7 +155,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
             self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/blockdiag-.*?.png}}')
 
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_caption_option(self, app):
+    def test_caption_option(self, app, status, warning):
         """
         .. blockdiag::
            :caption: hello world
@@ -172,7 +172,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
             self.assertRegexpMatches(source, figure)
 
     @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_caption_option_and_align_option(self, app):
+    def test_caption_option_and_align_option(self, app, status, warning):
         """
         .. blockdiag::
            :align: left
