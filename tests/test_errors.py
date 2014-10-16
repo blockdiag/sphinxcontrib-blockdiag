@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from mock import patch
-from .utils import FakeSphinx, with_app, with_built_docstring
-import sphinxcontrib.blockdiag
+from sphinx_testing import with_app
 from blockdiag.utils.compat import u
 
 import sys
@@ -13,28 +12,22 @@ else:
 
 
 class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
-    def setUp(self):
-        self.app = FakeSphinx()
-        sphinxcontrib.blockdiag.setup(self.app)
-
-    def tearDown(self):
-        self.app.cleanup()
-
-    @with_built_docstring(confoverrides=dict(master_doc='index', extensions=['sphinxcontrib.blockdiag']))
+    @with_app(srcdir='tests/docs/basic', write_docstring=True)
     def test_parse_error(self, app, status, warning):
         """
         .. blockdiag::
 
            { A -> B;
         """
+        app.builder.build_all()
         self.assertIn('got unexpected token:', warning.getvalue())
 
-    @with_app(srcdir='docs/basic', confoverrides=dict(blockdiag_html_image_format='JPG'))
+    @with_app(srcdir='tests/docs/basic', confoverrides=dict(blockdiag_html_image_format='JPG'))
     def test_unknown_format_error(self, app, status, warning):
         app.builder.build_all()
         self.assertIn('unknown format: JPG', warning.getvalue())
 
-    @with_app(srcdir='docs/basic', confoverrides=dict(blockdiag_html_image_format='PDF'))
+    @with_app(srcdir='tests/docs/basic', confoverrides=dict(blockdiag_html_image_format='PDF'))
     def test_reportlab_not_found_error(self, app, status, warning):
         try:
             # unload reportlab and make loading it impossible
@@ -49,14 +42,14 @@ class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
         finally:
             sys.path = path
 
-    @with_app(srcdir='docs/basic')
+    @with_app(srcdir='tests/docs/basic')
     @patch("blockdiag.utils.rst.nodes.blockdiag.processor.drawer.DiagramDraw")
     def test_rendering_error(self, app, status, warning, DiagramDraw):
         DiagramDraw.side_effect = RuntimeError("UNKNOWN ERROR!")
         app.builder.build_all()
         self.assertIn('UNKNOWN ERROR!', warning.getvalue())
 
-    @with_app(srcdir='docs/basic')
+    @with_app(srcdir='tests/docs/basic')
     @patch("sphinxcontrib.blockdiag.blockdiag.drawer.DiagramDraw.draw")
     def test_font_settings_error(self, app, status, warning, draw):
         draw.side_effect = UnicodeEncodeError("", u(""), 0, 0, "")
