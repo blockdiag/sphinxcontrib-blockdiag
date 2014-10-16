@@ -364,4 +364,4 @@ class TestSphinxcontribSeqdiagHTML(unittest.TestCase):
             self.assertNotRegexpMatches(source, '<a xlink:href="#hello-world">\\n\\s*<rect .*?>\\n\\s*</a>')
         else:
             self.assertNotRegex(source, '<a xlink:href="#hello-world">\\n\\s*<rect .*?>\\n\\s*</a>')
-            self.assertIn('undefined label: unknown_target', warning.getvalue())
+        self.assertIn('undefined label: unknown_target', warning.getvalue())

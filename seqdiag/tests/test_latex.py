@@ -30,7 +30,7 @@ with_oldpdf_app = with_app(srcdir='tests/docs/basic',
                            buildername='latex',
                            write_docstring=True,
                            confoverrides={
-                               'seqdiag_latex_image_format': 'PDF',
+                               'seqdiag_tex_image_format': 'PDF',
                                'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
                                'seqdiag_fontpath': seqdiag_fontpath,
                            })
