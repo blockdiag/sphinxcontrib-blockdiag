@@ -59,7 +59,9 @@ class rackdiag_node(rackdiag.utils.rst.nodes.rackdiag):
                        fontmap=builder.config.rackdiag_fontmap,
                        format=image_format)
 
-        if hasattr(builder, 'imgpath'):
+        if hasattr(builder, 'imagedir'):  # Sphinx (>= 1.3.x)
+            outputdir = os.path.join(builder.outdir, builder.imagedir)
+        elif hasattr(builder, 'imgpath'):  # Sphinx (<= 1.2.x) and HTML writer
             outputdir = os.path.join(builder.outdir, '_images')
         else:
             outputdir = builder.outdir

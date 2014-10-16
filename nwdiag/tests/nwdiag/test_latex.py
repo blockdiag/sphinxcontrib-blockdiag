@@ -46,7 +46,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/nwdiag-.*?.png}')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/latex/nwdiag-.*?.png}')
 
     @unittest.skipUnless(os.path.exists(nwdiag_fontpath), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
@@ -59,7 +59,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/nwdiag-.*?.pdf}')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/latex/nwdiag-.*?.pdf}')
 
     @unittest.skipUnless(os.path.exists(nwdiag_fontpath), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
@@ -72,7 +72,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/nwdiag-.*?.pdf}')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/latex/nwdiag-.*?.pdf}')
 
     @with_png_app
     def test_width_option(self, app, status, warning):
@@ -84,7 +84,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/nwdiag-.*?.png}')
+        self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/latex/nwdiag-.*?.png}')
 
     @with_png_app
     def test_height_option(self, app, status, warning):
@@ -96,7 +96,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/nwdiag-.*?.png}')
+        self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/latex/nwdiag-.*?.png}')
 
     @with_png_app
     def test_scale_option(self, app, status, warning):
@@ -108,7 +108,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/nwdiag-.*?.png}}')
+        self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/latex/nwdiag-.*?.png}}')
 
     @with_png_app
     def test_align_option_left(self, app, status, warning):
@@ -120,7 +120,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/nwdiag-.*?.png}\\\\hfill}')
+        self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/latex/nwdiag-.*?.png}\\\\hfill}')
 
     @with_png_app
     def test_align_option_center(self, app, status, warning):
@@ -132,7 +132,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/nwdiag-.*?.png}\\\\hfill}')
+        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/latex/nwdiag-.*?.png}\\\\hfill}')
 
     @with_png_app
     def test_align_option_right(self, app, status, warning):
@@ -144,7 +144,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/nwdiag-.*?.png}}')
+        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/latex/nwdiag-.*?.png}}')
 
     @with_png_app
     def test_caption_option(self, app, status, warning):
@@ -156,7 +156,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/nwdiag-.*?.png}')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/latex/nwdiag-.*?.png}')
 
         figure = re.compile('\\\\begin{figure}\\[htbp\\]\n\\\\centering.*?'
                             '\\\\caption{hello world}\\\\end{figure}', re.DOTALL)
@@ -173,7 +173,7 @@ class TestSphinxcontribNwdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/nwdiag-.*?.png}')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/latex/nwdiag-.*?.png}')
 
         figure = re.compile('\\\\begin{figure}\\[htbp\\]\\\\begin{flushleft}.*?'
                             '\\\\caption{hello world}\\\\end{flushleft}\\\\end{figure}', re.DOTALL)
