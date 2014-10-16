@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import io
 import os
 import re
-from .utils import with_built_docstring
+from sphinx_testing import with_app
 from blockdiag.utils.compat import u
 
 import sys
@@ -12,71 +11,70 @@ if sys.version_info < (2, 7):
 else:
     import unittest
 
-png_config = dict(
-    extensions=['sphinxcontrib.blockdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-)
-
-pdf_config = dict(
-    extensions=['sphinxcontrib.blockdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-    blockdiag_latex_image_format='PDF',
-    blockdiag_fontpath='/usr/share/fonts/truetype/ipafont/ipagp.ttf',
-)
-
-pdf_config_oldstyle = dict(
-    extensions=['sphinxcontrib.blockdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-    blockdiag_tex_image_format='PDF',
-    blockdiag_fontpath='/usr/share/fonts/truetype/ipafont/ipagp.ttf',
-)
+blockdiag_fontpath = '/usr/share/fonts/truetype/ipafont/ipagp.ttf'
+with_png_app = with_app(srcdir='tests/docs/basic',
+                        buildername='latex',
+                        write_docstring=True,
+                        confoverrides={
+                            'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                        })
+with_pdf_app = with_app(srcdir='tests/docs/basic',
+                        buildername='latex',
+                        write_docstring=True,
+                        confoverrides={
+                            'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                            'blockdiag_latex_image_format': 'PDF',
+                            'blockdiag_fontpath': blockdiag_fontpath,
+                        })
+with_oldpdf_app = with_app(srcdir='tests/docs/basic',
+                           buildername='latex',
+                           write_docstring=True,
+                           confoverrides={
+                               'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                               'blockdiag_tex_image_format': 'PDF',
+                               'blockdiag_fontpath': blockdiag_fontpath,
+                           })
 
 
 class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_build_png_image(self, app, status, warning):
         """
         .. blockdiag::
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
 
-    @unittest.skipUnless(os.path.exists(pdf_config['blockdiag_fontpath']), "TrueType font not found")
+    @unittest.skipUnless(os.path.exists(blockdiag_fontpath), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
-    @with_built_docstring(buildername='latex', confoverrides=pdf_config)
+    @with_pdf_app
     def test_build_pdf_image1(self, app, status, warning):
         """
         .. blockdiag::
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.pdf}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.pdf}')
 
-    @unittest.skipUnless(os.path.exists(pdf_config['blockdiag_fontpath']), "TrueType font not found")
+    @unittest.skipUnless(os.path.exists(blockdiag_fontpath), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
-    @with_built_docstring(buildername='latex', confoverrides=pdf_config_oldstyle)
+    @with_oldpdf_app
     def test_build_pdf_image2(self, app, status, warning):
         """
         .. blockdiag::
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.pdf}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.pdf}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_width_option(self, app, status, warning):
         """
         .. blockdiag::
@@ -84,12 +82,11 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/blockdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/blockdiag-.*?.png}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_height_option(self, app, status, warning):
         """
         .. blockdiag::
@@ -97,12 +94,11 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/blockdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/blockdiag-.*?.png}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_scale_option(self, app, status, warning):
         """
         .. blockdiag::
@@ -110,12 +106,11 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/blockdiag-.*?.png}}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/blockdiag-.*?.png}}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_align_option_left(self, app, status, warning):
         """
         .. blockdiag::
@@ -123,12 +118,11 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/blockdiag-.*?.png}\\\\hfill}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/blockdiag-.*?.png}\\\\hfill}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_align_option_center(self, app, status, warning):
         """
         .. blockdiag::
@@ -136,12 +130,11 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/blockdiag-.*?.png}\\\\hfill}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/blockdiag-.*?.png}\\\\hfill}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_align_option_right(self, app, status, warning):
         """
         .. blockdiag::
@@ -149,12 +142,11 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/blockdiag-.*?.png}}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/blockdiag-.*?.png}}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_caption_option(self, app, status, warning):
         """
         .. blockdiag::
@@ -162,16 +154,15 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
 
-            figure = re.compile('\\\\begin{figure}\\[htbp\\]\n\\\\centering.*?'
-                                '\\\\caption{hello world}\\\\end{figure}', re.DOTALL)
-            self.assertRegexpMatches(source, figure)
+        figure = re.compile('\\\\begin{figure}\\[htbp\\]\n\\\\centering.*?'
+                            '\\\\caption{hello world}\\\\end{figure}', re.DOTALL)
+        self.assertRegexpMatches(source, figure)
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
+    @with_png_app
     def test_caption_option_and_align_option(self, app, status, warning):
         """
         .. blockdiag::
@@ -180,11 +171,10 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with io.open(filename, encoding='utf-8') as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/blockdiag-.*?.png}')
 
-            figure = re.compile('\\\\begin{figure}\\[htbp\\]\\\\begin{flushleft}.*?'
-                                '\\\\caption{hello world}\\\\end{flushleft}\\\\end{figure}', re.DOTALL)
-            self.assertRegexpMatches(source, figure)
+        figure = re.compile('\\\\begin{figure}\\[htbp\\]\\\\begin{flushleft}.*?'
+                            '\\\\caption{hello world}\\\\end{flushleft}\\\\end{figure}', re.DOTALL)
+        self.assertRegexpMatches(source, figure)
