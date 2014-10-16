@@ -2,7 +2,7 @@
 
 import os
 import re
-from .utils import with_built_docstring
+from sphinx_testing import with_app
 from blockdiag.utils.compat import u
 
 import sys
@@ -11,167 +11,159 @@ if sys.version_info < (2, 7):
 else:
     import unittest
 
-png_config = dict(
-    extensions=['sphinxcontrib.seqdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-)
-
-pdf_config = dict(
-    extensions=['sphinxcontrib.seqdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-    seqdiag_latex_image_format='PDF',
-    seqdiag_fontpath='/usr/share/fonts/truetype/ipafont/ipagp.ttf',
-)
-
-pdf_config_oldstyle = dict(
-    extensions=['sphinxcontrib.seqdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-    seqdiag_tex_image_format='PDF',
-    seqdiag_fontpath='/usr/share/fonts/truetype/ipafont/ipagp.ttf',
-)
+seqdiag_fontpath = '/usr/share/fonts/truetype/ipafont/ipagp.ttf'
+with_png_app = with_app(srcdir='tests/docs/basic',
+                        buildername='latex',
+                        write_docstring=True,
+                        confoverrides={
+                            'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                        })
+with_pdf_app = with_app(srcdir='tests/docs/basic',
+                        buildername='latex',
+                        write_docstring=True,
+                        confoverrides={
+                            'seqdiag_latex_image_format': 'PDF',
+                            'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                            'seqdiag_fontpath': seqdiag_fontpath,
+                        })
+with_oldpdf_app = with_app(srcdir='tests/docs/basic',
+                           buildername='latex',
+                           write_docstring=True,
+                           confoverrides={
+                               'seqdiag_latex_image_format': 'PDF',
+                               'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                               'seqdiag_fontpath': seqdiag_fontpath,
+                           })
 
 
 class TestSphinxcontribSeqdiagLatex(unittest.TestCase):
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_build_png_image(self, app):
+    @with_png_app
+    def test_build_png_image(self, app, status, warning):
         """
         .. seqdiag::
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.png}')
 
-    @unittest.skipUnless(os.path.exists(pdf_config['seqdiag_fontpath']), "TrueType font not found")
+    @unittest.skipUnless(os.path.exists(seqdiag_fontpath), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
-    @with_built_docstring(buildername='latex', confoverrides=pdf_config)
-    def test_build_pdf_image1(self, app):
+    @with_pdf_app
+    def test_build_pdf_image1(self, app, status, warning):
         """
         .. seqdiag::
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.pdf}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.pdf}')
 
-    @unittest.skipUnless(os.path.exists(pdf_config['seqdiag_fontpath']), "TrueType font not found")
+    @unittest.skipUnless(os.path.exists(seqdiag_fontpath), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
-    @with_built_docstring(buildername='latex', confoverrides=pdf_config_oldstyle)
-    def test_build_pdf_image2(self, app):
+    @with_oldpdf_app
+    def test_build_pdf_image2(self, app, status, warning):
         """
         .. seqdiag::
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.pdf}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.pdf}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_width_option(self, app):
+    @with_png_app
+    def test_width_option(self, app, status, warning):
         """
         .. seqdiag::
            :width: 3cm
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/seqdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/seqdiag-.*?.png}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_height_option(self, app):
+    @with_png_app
+    def test_height_option(self, app, status, warning):
         """
         .. seqdiag::
            :height: 4cm
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/seqdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/seqdiag-.*?.png}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_scale_option(self, app):
+    @with_png_app
+    def test_scale_option(self, app, status, warning):
         """
         .. seqdiag::
            :scale: 50%
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/seqdiag-.*?.png}}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/seqdiag-.*?.png}}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_left(self, app):
+    @with_png_app
+    def test_align_option_left(self, app, status, warning):
         """
         .. seqdiag::
            :align: left
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/seqdiag-.*?.png}\\\\hfill}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/seqdiag-.*?.png}\\\\hfill}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_center(self, app):
+    @with_png_app
+    def test_align_option_center(self, app, status, warning):
         """
         .. seqdiag::
            :align: center
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/seqdiag-.*?.png}\\\\hfill}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/seqdiag-.*?.png}\\\\hfill}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_right(self, app):
+    @with_png_app
+    def test_align_option_right(self, app, status, warning):
         """
         .. seqdiag::
            :align: right
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/seqdiag-.*?.png}}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/seqdiag-.*?.png}}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_caption_option(self, app):
+    @with_png_app
+    def test_caption_option(self, app, status, warning):
         """
         .. seqdiag::
            :caption: hello world
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.png}')
 
-            figure = re.compile('\\\\begin{figure}\\[htbp\\]\n\\\\centering.*?'
-                                '\\\\caption{hello world}\\\\end{figure}', re.DOTALL)
-            self.assertRegexpMatches(source, figure)
+        figure = re.compile('\\\\begin{figure}\\[htbp\\]\n\\\\centering.*?'
+                            '\\\\caption{hello world}\\\\end{figure}', re.DOTALL)
+        self.assertRegexpMatches(source, figure)
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_caption_option_and_align_option(self, app):
+    @with_png_app
+    def test_caption_option_and_align_option(self, app, status, warning):
         """
         .. seqdiag::
            :align: left
@@ -179,11 +171,10 @@ class TestSphinxcontribSeqdiagLatex(unittest.TestCase):
 
            A -> B;
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/seqdiag-.*?.png}')
 
-            figure = re.compile('\\\\begin{figure}\\[htbp\\]\\\\begin{flushleft}.*?'
-                                '\\\\caption{hello world}\\\\end{flushleft}\\\\end{figure}', re.DOTALL)
-            self.assertRegexpMatches(source, figure)
+        figure = re.compile('\\\\begin{figure}\\[htbp\\]\\\\begin{flushleft}.*?'
+                            '\\\\caption{hello world}\\\\end{flushleft}\\\\end{figure}', re.DOTALL)
+        self.assertRegexpMatches(source, figure)
