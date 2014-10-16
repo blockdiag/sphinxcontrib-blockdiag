@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from mock import patch, Mock
+from mock import patch
 from sphinx_testing import with_app
 from blockdiag.utils.compat import u
 
