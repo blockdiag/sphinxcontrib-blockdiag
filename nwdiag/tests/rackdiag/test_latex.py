@@ -2,7 +2,7 @@
 
 import os
 import re
-from ..utils import with_built_docstring
+from sphinx_testing import with_app
 from blockdiag.utils.compat import u
 
 import sys
@@ -11,75 +11,74 @@ if sys.version_info < (2, 7):
 else:
     import unittest
 
-png_config = dict(
-    extensions=['sphinxcontrib.rackdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-)
-
-pdf_config = dict(
-    extensions=['sphinxcontrib.rackdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-    rackdiag_latex_image_format='PDF',
-    rackdiag_fontpath='/usr/share/fonts/truetype/ipafont/ipagp.ttf',
-)
-
-pdf_config_oldstyle = dict(
-    extensions=['sphinxcontrib.rackdiag'],
-    master_doc='index',
-    latex_documents=[('index', 'test.tex', u(''), u('test'), 'manual')],
-    rackdiag_tex_image_format='PDF',
-    rackdiag_fontpath='/usr/share/fonts/truetype/ipafont/ipagp.ttf',
-)
+rackdiag_fontpath = '/usr/share/fonts/truetype/ipafont/ipagp.ttf'
+with_png_app = with_app(srcdir='tests/docs/rackdiag',
+                        buildername='latex',
+                        write_docstring=True,
+                        confoverrides={
+                            'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                        })
+with_pdf_app = with_app(srcdir='tests/docs/rackdiag',
+                        buildername='latex',
+                        write_docstring=True,
+                        confoverrides={
+                            'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                            'rackdiag_latex_image_format': 'PDF',
+                            'rackdiag_fontpath': rackdiag_fontpath,
+                        })
+with_oldpdf_app = with_app(srcdir='tests/docs/rackdiag',
+                           buildername='latex',
+                           write_docstring=True,
+                           confoverrides={
+                               'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                               'rackdiag_tex_image_format': 'PDF',
+                               'rackdiag_fontpath': rackdiag_fontpath,
+                           })
 
 
 class TestSphinxcontribRackdiagLatex(unittest.TestCase):
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_build_png_image(self, app):
+    @with_png_app
+    def test_build_png_image(self, app, status, warning):
         """
         .. rackdiag::
 
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.png}')
 
-    @unittest.skipUnless(os.path.exists(pdf_config['rackdiag_fontpath']), "TrueType font not found")
+    @unittest.skipUnless(os.path.exists(rackdiag_fontpath), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
-    @with_built_docstring(buildername='latex', confoverrides=pdf_config)
-    def test_build_pdf_image1(self, app):
+    @with_pdf_app
+    def test_build_pdf_image1(self, app, status, warning):
         """
         .. rackdiag::
 
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.pdf}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.pdf}')
 
-    @unittest.skipUnless(os.path.exists(pdf_config['rackdiag_fontpath']), "TrueType font not found")
+    @unittest.skipUnless(os.path.exists(rackdiag_fontpath), "TrueType font not found")
     @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
-    @with_built_docstring(buildername='latex', confoverrides=pdf_config_oldstyle)
-    def test_build_pdf_image2(self, app):
+    @with_oldpdf_app
+    def test_build_pdf_image2(self, app, status, warning):
         """
         .. rackdiag::
 
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.pdf}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.pdf}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_width_option(self, app):
+    @with_png_app
+    def test_width_option(self, app, status, warning):
         """
         .. rackdiag::
            :width: 3cm
@@ -87,13 +86,12 @@ class TestSphinxcontribRackdiagLatex(unittest.TestCase):
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/rackdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{.*?/rackdiag-.*?.png}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_height_option(self, app):
+    @with_png_app
+    def test_height_option(self, app, status, warning):
         """
         .. rackdiag::
            :height: 4cm
@@ -101,13 +99,12 @@ class TestSphinxcontribRackdiagLatex(unittest.TestCase):
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/rackdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{.*?/rackdiag-.*?.png}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_scale_option(self, app):
+    @with_png_app
+    def test_scale_option(self, app, status, warning):
         """
         .. rackdiag::
            :scale: 50%
@@ -115,13 +112,12 @@ class TestSphinxcontribRackdiagLatex(unittest.TestCase):
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/rackdiag-.*?.png}}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{.*?/rackdiag-.*?.png}}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_left(self, app):
+    @with_png_app
+    def test_align_option_left(self, app, status, warning):
         """
         .. rackdiag::
            :align: left
@@ -129,13 +125,12 @@ class TestSphinxcontribRackdiagLatex(unittest.TestCase):
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/rackdiag-.*?.png}\\\\hfill}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\includegraphics{.*?/rackdiag-.*?.png}\\\\hfill}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_center(self, app):
+    @with_png_app
+    def test_align_option_center(self, app, status, warning):
         """
         .. rackdiag::
            :align: center
@@ -143,13 +138,12 @@ class TestSphinxcontribRackdiagLatex(unittest.TestCase):
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/rackdiag-.*?.png}\\\\hfill}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/rackdiag-.*?.png}\\\\hfill}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_align_option_right(self, app):
+    @with_png_app
+    def test_align_option_right(self, app, status, warning):
         """
         .. rackdiag::
            :align: right
@@ -157,13 +151,12 @@ class TestSphinxcontribRackdiagLatex(unittest.TestCase):
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/rackdiag-.*?.png}}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{.*?/rackdiag-.*?.png}}')
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_caption_option(self, app):
+    @with_png_app
+    def test_caption_option(self, app, status, warning):
         """
         .. rackdiag::
            :caption: hello world
@@ -171,17 +164,16 @@ class TestSphinxcontribRackdiagLatex(unittest.TestCase):
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.png}')
 
-            figure = re.compile('\\\\begin{figure}\\[htbp\\]\n\\\\centering.*?'
-                                '\\\\caption{hello world}\\\\end{figure}', re.DOTALL)
-            self.assertRegexpMatches(source, figure)
+        figure = re.compile('\\\\begin{figure}\\[htbp\\]\n\\\\centering.*?'
+                            '\\\\caption{hello world}\\\\end{figure}', re.DOTALL)
+        self.assertRegexpMatches(source, figure)
 
-    @with_built_docstring(buildername='latex', confoverrides=png_config)
-    def test_caption_option_and_align_option(self, app):
+    @with_png_app
+    def test_caption_option_and_align_option(self, app, status, warning):
         """
         .. rackdiag::
            :align: left
@@ -190,11 +182,10 @@ class TestSphinxcontribRackdiagLatex(unittest.TestCase):
            * A
            * B
         """
-        filename = os.path.join(app.outdir, 'test.tex')
-        with open(filename) as fd:
-            source = fd.read()
-            self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.png}')
+        app.builder.build_all()
+        source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '\\\\includegraphics{.*?/rackdiag-.*?.png}')
 
-            figure = re.compile('\\\\begin{figure}\\[htbp\\]\\\\begin{flushleft}.*?'
-                                '\\\\caption{hello world}\\\\end{flushleft}\\\\end{figure}', re.DOTALL)
-            self.assertRegexpMatches(source, figure)
+        figure = re.compile('\\\\begin{figure}\\[htbp\\]\\\\begin{flushleft}.*?'
+                            '\\\\caption{hello world}\\\\end{flushleft}\\\\end{figure}', re.DOTALL)
+        self.assertRegexpMatches(source, figure)
