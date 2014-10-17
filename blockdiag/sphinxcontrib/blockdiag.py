@@ -38,8 +38,10 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
             filename = self.get_abspath(image_format, builder)
 
         antialias = builder.config.blockdiag_antialias
+        transparency = builder.config.blockdiag_transparency
         image = super(blockdiag_node, self).to_drawer(image_format, filename, fontmap,
-                                                      antialias=antialias, **kwargs)
+                                                      antialias=antialias, transparency=transparency,
+                                                      **kwargs)
         for node in image.diagram.traverse_nodes():
             node.href = resolve_reference(builder, node.href)
 
@@ -305,6 +307,7 @@ def setup(app):
     app.add_config_value('blockdiag_fontpath', None, 'html')
     app.add_config_value('blockdiag_fontmap', None, 'html')
     app.add_config_value('blockdiag_antialias', False, 'html')
+    app.add_config_value('blockdiag_transparency', True, 'html')
     app.add_config_value('blockdiag_debug', False, 'html')
     app.add_config_value('blockdiag_html_image_format', 'PNG', 'html')
     app.add_config_value('blockdiag_tex_image_format', None, 'html')  # backward compatibility for 1.3.1
