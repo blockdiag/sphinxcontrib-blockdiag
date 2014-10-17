@@ -7,11 +7,11 @@ requires = ['blockdiag>=1.4.1', 'Sphinx>=0.6', 'setuptools']
 
 setup(
     name='sphinxcontrib-blockdiag',
-    version='1.4.4',
+    version='1.5.0',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-blockdiag',
     license='BSD',
-    author='Takeshi Komiya',
+    author='Takeshi KOMIYA',
     author_email='i.tkomiya@gmail.com',
     description='Sphinx "blockdiag" extension',
     long_description=open("README.rst").read(),
