@@ -51,7 +51,8 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
         options = dict(antialias=builder.config.blockdiag_antialias,
                        fontpath=builder.config.blockdiag_fontpath,
                        fontmap=builder.config.blockdiag_fontmap,
-                       format=image_format)
+                       format=image_format,
+                       transparency=builder.config.blockdiag_transparency)
         outputdir = getattr(builder, 'imgpath', builder.outdir)
         return os.path.join(outputdir, self.get_path(**options))
 
@@ -59,7 +60,8 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
         options = dict(antialias=builder.config.blockdiag_antialias,
                        fontpath=builder.config.blockdiag_fontpath,
                        fontmap=builder.config.blockdiag_fontmap,
-                       format=image_format)
+                       format=image_format,
+                       transparency=builder.config.blockdiag_transparency)
 
         if hasattr(builder, 'imagedir'):  # Sphinx (>= 1.3.x)
             outputdir = os.path.join(builder.outdir, builder.imagedir)
