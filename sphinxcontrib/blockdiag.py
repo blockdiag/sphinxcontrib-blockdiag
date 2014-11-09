@@ -88,6 +88,8 @@ def resolve_reference(builder, href):
     matched = pattern.search(href)
     if matched is None:
         return href
+    elif not hasattr(builder, 'current_docname'):  # ex. latex builder
+        return matched.group(1)
     else:
         refid = matched.group(1)
         domain = builder.env.domains['std']
