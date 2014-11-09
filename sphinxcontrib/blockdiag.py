@@ -15,6 +15,7 @@ from __future__ import absolute_import
 import os
 import re
 import traceback
+import pkg_resources
 from collections import namedtuple
 from docutils import nodes
 from sphinx import addnodes
@@ -318,3 +319,9 @@ def setup(app):
     app.add_config_value('blockdiag_latex_image_format', 'PNG', 'html')
     app.connect("builder-inited", on_builder_inited)
     app.connect("doctree-resolved", on_doctree_resolved)
+
+    return {
+        'version': pkg_resources.require('blockdiag')[0].version,
+        'parallel_read_safe': True,
+        'parallel_write_safe': True,
+    }
