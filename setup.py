@@ -3,11 +3,11 @@
 from setuptools import setup, find_packages
 
 
-requires = ['blockdiag>=1.4.1', 'Sphinx>=0.6', 'setuptools']
+requires = ['blockdiag>=1.5.0', 'Sphinx>=0.6', 'setuptools']
 
 setup(
     name='sphinxcontrib-blockdiag',
-    version='1.5.0',
+    version='1.5.1',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-blockdiag',
     license='BSD',
