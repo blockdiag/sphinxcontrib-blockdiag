@@ -2,11 +2,11 @@
 
 from setuptools import setup, find_packages
 
-requires = ['seqdiag>=0.9.3', 'Sphinx>=0.6', 'setuptools']
+requires = ['blockdiag>=1.5.0', 'seqdiag>=0.9.3', 'Sphinx>=0.6', 'setuptools']
 
 setup(
     name='sphinxcontrib-seqdiag',
-    version='0.8.0',
+    version='0.8.1',
     url='http://bitbucket.org/birkenfeld/sphinx-contrib',
     download_url='http://pypi.python.org/pypi/sphinxcontrib-seqdiag',
     license='BSD',
