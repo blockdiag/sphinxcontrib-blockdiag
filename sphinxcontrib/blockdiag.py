@@ -298,7 +298,7 @@ def on_doctree_resolved(self, doctree, docname):
                     image.draw()
                     image.save()
 
-                image = nodes.image(uri=image.filename, candidates={'*': relfn}, **node['options'])
+                image = nodes.image(uri=relfn, candidates={'*': relfn}, **node['options'])
                 node.parent.replace(node, image)
         except Exception as exc:
             if self.builder.config.blockdiag_debug:
