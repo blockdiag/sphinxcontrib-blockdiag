@@ -224,7 +224,7 @@ def html_depart_blockdiag(self, node):
 
 
 def get_image_format_for(builder):
-    if builder.format == 'html':
+    if builder.format in ('html', 'slides'):
         image_format = builder.config.blockdiag_html_image_format.upper()
     elif builder.format == 'latex':
         if builder.config.blockdiag_tex_image_format:
@@ -274,7 +274,7 @@ def on_builder_inited(self):
 
 
 def on_doctree_resolved(self, doctree, docname):
-    if self.builder.format == 'html':
+    if self.builder.format in ('html', 'slides'):
         return
 
     try:
