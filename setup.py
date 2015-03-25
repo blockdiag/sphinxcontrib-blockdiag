@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 
-requires = ['blockdiag>=1.5.0', 'Sphinx>=0.6', 'setuptools']
+requires = ['blockdiag>=1.5.0', 'Sphinx>=0.6']
 
 setup(
     name='sphinxcontrib-blockdiag',
