@@ -55,7 +55,12 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
                        fontmap=builder.config.blockdiag_fontmap,
                        format=image_format,
                        transparency=builder.config.blockdiag_transparency)
-        outputdir = getattr(builder, 'imgpath', builder.outdir)
+        if hasattr(builder, 'imagedir'):  # Sphinx (>= 1.3.x)
+            outputdir = builder.imagedir
+        elif hasattr(builder, 'imgpath'):  # Sphinx (<= 1.2.x) or HTML writer
+            outputdir = '_images'
+        else:
+            outputdir = ''
         return os.path.join(outputdir, self.get_path(**options))
 
     def get_abspath(self, image_format, builder):
