@@ -1,0 +1,6 @@
+dependencies:
+  override:
+    - pip install docutils tox
+test:
+  override:
+    - tox -e blockdiag_dev
