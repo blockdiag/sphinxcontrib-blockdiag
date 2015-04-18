@@ -8,8 +8,7 @@ requires = ['blockdiag>=1.5.0', 'Sphinx>=0.6']
 setup(
     name='sphinxcontrib-blockdiag',
     version='1.5.1',
-    url='http://bitbucket.org/birkenfeld/sphinx-contrib',
-    download_url='http://pypi.python.org/pypi/sphinxcontrib-blockdiag',
+    url='https://github.com/tk0miya/sphinxcontrib-blockdiag',
     license='BSD',
     author='Takeshi KOMIYA',
     author_email='i.tkomiya@gmail.com',
