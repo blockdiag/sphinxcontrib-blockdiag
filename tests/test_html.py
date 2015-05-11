@@ -41,7 +41,6 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'subdir' / 'index.html').read_text(encoding='utf-8')
-        print source
         self.assertRegexpMatches(source, '<div><img .*? src="\.\./_images/.*?.png" .*?/></div>')
 
     @with_png_app
