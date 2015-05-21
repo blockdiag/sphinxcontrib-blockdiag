@@ -171,6 +171,7 @@ def html_render_png(self, node):
 
     # link to original image
     relpath = node.get_relpath('PNG', self.builder)
+    relpath = relpath.replace(os.path.sep, '/')
     if 'width' in node['options'] or 'height' in node['options'] or 'scale' in node['options']:
         self.body.append('<a class="reference internal image-reference" href="%s">' % relpath)
         self.context.append('</a>')
