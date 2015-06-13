@@ -14,6 +14,7 @@ from __future__ import absolute_import
 
 import os
 import re
+import posixpath
 import traceback
 import pkg_resources
 from collections import namedtuple
@@ -59,7 +60,7 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
             outputdir = builder.imgpath
         else:
             outputdir = ''
-        return os.path.join(outputdir, self.get_path(**options))
+        return posixpath.join(outputdir, self.get_path(**options))
 
     def get_abspath(self, image_format, builder):
         options = dict(antialias=builder.config.blockdiag_antialias,
