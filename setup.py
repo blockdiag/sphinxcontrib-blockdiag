@@ -8,7 +8,7 @@ requires = ['blockdiag>=1.5.0', 'Sphinx>=0.6']
 setup(
     name='sphinxcontrib-blockdiag',
     version='1.5.3',
-    url='https://github.com/tk0miya/sphinxcontrib-blockdiag',
+    url='https://github.com/blockdiag/sphinxcontrib-blockdiag',
     license='BSD',
     author='Takeshi KOMIYA',
     author_email='i.tkomiya@gmail.com',
