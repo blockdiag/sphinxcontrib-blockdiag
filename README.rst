@@ -2,14 +2,14 @@
 sphinxcontrib-blockdiag
 =======================
 
-.. image:: https://travis-ci.org/tk0miya/sphinxcontrib-blockdiag.svg?branch=master
-   :target: https://travis-ci.org/tk0miya/sphinxcontrib-blockdiag
+.. image:: https://travis-ci.org/blockdiag/sphinxcontrib-blockdiag.svg?branch=master
+   :target: https://travis-ci.org/blockdiag/sphinxcontrib-blockdiag
 
-.. image:: https://coveralls.io/repos/tk0miya/sphinxcontrib-blockdiag/badge.png?branch=master
-   :target: https://coveralls.io/r/tk0miya/sphinxcontrib-blockdiag?branch=master
+.. image:: https://coveralls.io/repos/blockdiag/sphinxcontrib-blockdiag/badge.png?branch=master
+   :target: https://coveralls.io/r/blockdiag/sphinxcontrib-blockdiag?branch=master
 
-.. image:: https://codeclimate.com/github/tk0miya/sphinxcontrib-blockdiag/badges/gpa.svg
-   :target: https://codeclimate.com/github/tk0miya/sphinxcontrib-blockdiag
+.. image:: https://codeclimate.com/github/blockdiag/sphinxcontrib-blockdiag/badges/gpa.svg
+   :target: https://codeclimate.com/github/blockdiag/sphinxcontrib-blockdiag
 
 A sphinx extension for embedding block diagram using blockdiag_.
 
