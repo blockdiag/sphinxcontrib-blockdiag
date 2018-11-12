@@ -261,7 +261,7 @@ def on_builder_inited(self):
     try:
         fontmappath = self.builder.config.blockdiag_fontmap
         fontmap = FontMap(fontmappath)
-    except:
+    except Exception:
         fontmap = FontMap(None)
 
     try:
@@ -273,7 +273,7 @@ def on_builder_inited(self):
             config = namedtuple('Config', 'font')(fontpath)
             fontpath = detectfont(config)
             fontmap.set_default_font(fontpath)
-    except:
+    except Exception:
         pass
 
 
