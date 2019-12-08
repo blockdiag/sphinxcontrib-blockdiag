@@ -3,7 +3,6 @@
 import os
 import re
 from sphinx_testing import with_app
-from blockdiag.utils.compat import u
 
 import unittest
 
@@ -14,13 +13,13 @@ with_png_app = with_app(srcdir='tests/docs/basic',
                         buildername='latex',
                         write_docstring=True,
                         confoverrides={
-                            'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                            'latex_documents': [('index', 'test.tex', '', 'test', 'manual')],
                         })
 with_pdf_app = with_app(srcdir='tests/docs/basic',
                         buildername='latex',
                         write_docstring=True,
                         confoverrides={
-                            'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                            'latex_documents': [('index', 'test.tex', '', 'test', 'manual')],
                             'blockdiag_latex_image_format': 'PDF',
                             'blockdiag_fontpath': blockdiag_fontpath,
                         })
@@ -28,7 +27,7 @@ with_oldpdf_app = with_app(srcdir='tests/docs/basic',
                            buildername='latex',
                            write_docstring=True,
                            confoverrides={
-                               'latex_documents': [('index', 'test.tex', u(''), u('test'), 'manual')],
+                               'latex_documents': [('index', 'test.tex', '', 'test', 'manual')],
                                'blockdiag_tex_image_format': 'PDF',
                                'blockdiag_fontpath': blockdiag_fontpath,
                            })
