@@ -1,20 +1,18 @@
 language: python
-python: 3.5
-env:
-  matrix:
-    - TOXENV=py26
-    - TOXENV=py27
-    - TOXENV=py33
-    - TOXENV=py32
-    - TOXENV=py34
-    - TOXENV=py35
-    - TOXENV=sphinx1.0
-    - TOXENV=sphinx1.1
-    - TOXENV=sphinx1.2
-    - TOXENV=blockdiag_dev
-    - TOXENV=coverage
-cache:
-  directories:
-    - $HOME/.cache/pip
-install: pip install docutils tox
+dist: xenial
+cache: pip
+matrix:
+  include:
+    - python: 3.5
+      env: TOXENV=py35
+    - python: 3.6
+      env: TOXENV=py36
+    - python: 3.7
+      env: TOXENV=py37
+    - python: 3.8
+      env: TOXENV=py38
+    - env: TOXENV=sphinx2.0
+    - env: TOXENV=blockdiag_dev
+    - env: TOXENV=coverage
+install: pip install -U docutils tox
 script: tox

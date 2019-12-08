@@ -5,11 +5,9 @@ import re
 from sphinx_testing import with_app
 from blockdiag.utils.compat import u
 
-import sys
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
+
+CR = "\r?\n"
 
 blockdiag_fontpath = '/usr/share/fonts/truetype/ipafont/ipagp.ttf'
 with_png_app = with_app(srcdir='tests/docs/basic',
@@ -46,10 +44,9 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{blockdiag-.*?.png}')
+        self.assertRegexpMatches(source, r'\\sphinxincludegraphics{{blockdiag-.*?}.png}')
 
     @unittest.skipUnless(os.path.exists(blockdiag_fontpath), "TrueType font not found")
-    @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
     @with_pdf_app
     def test_build_pdf_image1(self, app, status, warning):
         """
@@ -59,10 +56,9 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{blockdiag-.*?.pdf}')
+        self.assertRegexpMatches(source, r'\\sphinxincludegraphics{{blockdiag-.*?}.pdf}')
 
     @unittest.skipUnless(os.path.exists(blockdiag_fontpath), "TrueType font not found")
-    @unittest.skipIf(sys.version_info[:2] == (3, 2), "reportlab does not support python 3.2")
     @with_oldpdf_app
     def test_build_pdf_image2(self, app, status, warning):
         """
@@ -72,7 +68,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{blockdiag-.*?.pdf}')
+        self.assertRegexpMatches(source, r'\\sphinxincludegraphics{{blockdiag-.*?}.pdf}')
 
     @with_png_app
     def test_width_option(self, app, status, warning):
@@ -84,7 +80,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics\\[width=3cm\\]{blockdiag-.*?.png}')
+        self.assertRegexpMatches(source, r'\\sphinxincludegraphics\[width=3cm\]{{blockdiag-.*?}.png}')
 
     @with_png_app
     def test_height_option(self, app, status, warning):
@@ -96,7 +92,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics\\[height=4cm\\]{blockdiag-.*?.png}')
+        self.assertRegexpMatches(source, r'\\sphinxincludegraphics\[height=4cm\]{{blockdiag-.*?}.png}')
 
     @with_png_app
     def test_scale_option(self, app, status, warning):
@@ -108,7 +104,7 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\scalebox{0.500000}{\\\\includegraphics{blockdiag-.*?.png}}')
+        self.assertRegexpMatches(source, r'\\sphinxincludegraphics\[scale=0.5\]{{blockdiag-.*?}.png}')
 
     @with_png_app
     def test_align_option_left(self, app, status, warning):
@@ -120,7 +116,9 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '{\\\\includegraphics{blockdiag-.*?.png}\\\\hfill}')
+        self.assertRegexpMatches(source,
+                                 (r'{\\sphinxincludegraphics{{blockdiag-.*?}.png}'
+                                  r'\\hspace\*{\\fill}}'))
 
     @with_png_app
     def test_align_option_center(self, app, status, warning):
@@ -132,7 +130,10 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{blockdiag-.*?.png}\\\\hfill}')
+        self.assertRegexpMatches(source,
+                                 (r'{\\hspace\*{\\fill}'
+                                  r'\\sphinxincludegraphics{{blockdiag-.*?}.png}'
+                                  r'\\hspace\*{\\fill}}'))
 
     @with_png_app
     def test_align_option_right(self, app, status, warning):
@@ -144,7 +145,9 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '{\\\\hfill\\\\includegraphics{blockdiag-.*?.png}}')
+        self.assertRegexpMatches(source,
+                                 (r'{\\hspace\*{\\fill}'
+                                  r'\\sphinxincludegraphics{{blockdiag-.*?}.png}}'))
 
     @with_png_app
     def test_caption_option(self, app, status, warning):
@@ -156,10 +159,13 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{blockdiag-.*?.png}')
 
-        figure = re.compile('\\\\begin{figure}\\[htbp\\]\r?\n\\\\centering.*?'
-                            '\\\\caption{hello world}\\\\end{figure}', re.DOTALL)
+        figure = re.compile((r'\\begin{figure}\[htbp\]' + CR +
+                             r'\\centering' + CR +
+                             r'\\capstart' + CR + CR +
+                             r'\\noindent\\sphinxincludegraphics{{blockdiag-.*?}.png}' + CR +
+                             r'\\caption{hello world}\\label{\\detokenize{index:id1}}\\end{figure}'),
+                            re.DOTALL)
         self.assertRegexpMatches(source, figure)
 
     @with_png_app
@@ -173,10 +179,12 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{blockdiag-.*?.png}')
 
-        figure = re.compile('\\\\begin{figure}\\[htbp\\]\\\\begin{flushleft}.*?'
-                            '\\\\caption{hello world}\\\\end{flushleft}\\\\end{figure}', re.DOTALL)
+        figure = re.compile((r'\\begin{wrapfigure}{l}{0pt}' + CR +
+                             r'\\centering' + CR +
+                             r'\\noindent\\sphinxincludegraphics{{blockdiag-.*?}.png}' + CR +
+                             r'\\caption{hello world}\\label{\\detokenize{index:id1}}\\end{wrapfigure}'),
+                            re.DOTALL)
         self.assertRegexpMatches(source, figure)
 
     @with_png_app
@@ -189,4 +197,4 @@ class TestSphinxcontribBlockdiagLatex(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'test.tex').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '\\\\includegraphics{blockdiag-.*?.png}')
+        self.assertRegexpMatches(source, r'\\sphinxincludegraphics{{blockdiag-.*?}.png}')

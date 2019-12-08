@@ -3,6 +3,7 @@
 
 .coverage
 .tox/
+.mypy_cache/
 bin/
 include/
 lib/

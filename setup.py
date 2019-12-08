@@ -2,8 +2,7 @@
 
 from setuptools import setup, find_packages
 
-
-requires = ['blockdiag>=1.5.0', 'Sphinx>=0.6']
+requires = ['blockdiag>=1.5.0', 'Sphinx>=2.0']
 
 setup(
     name='sphinxcontrib-blockdiag',
@@ -24,12 +23,12 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Documentation',
         'Topic :: Documentation :: Sphinx',
         'Topic :: Utilities',

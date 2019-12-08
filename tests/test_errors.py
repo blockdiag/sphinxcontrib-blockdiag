@@ -5,10 +5,7 @@ from sphinx_testing import with_app
 from blockdiag.utils.compat import u
 
 import sys
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 
 class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
