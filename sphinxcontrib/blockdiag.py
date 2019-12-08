@@ -10,8 +10,6 @@
     :license: BSDL.
 """
 
-from __future__ import absolute_import
-
 import os
 import re
 import posixpath
@@ -26,7 +24,6 @@ from sphinx.util.osutil import ensuredir
 import blockdiag.utils.rst.nodes
 import blockdiag.utils.rst.directives
 from blockdiag.utils.bootstrap import detectfont, Application
-from blockdiag.utils.compat import string_types
 from blockdiag.utils.fontmap import FontMap
 from blockdiag.utils.rst.directives import with_blockdiag
 
@@ -260,7 +257,7 @@ def on_builder_inited(self):
 
     try:
         fontpath = self.builder.config.blockdiag_fontpath
-        if isinstance(fontpath, string_types):
+        if isinstance(fontpath, str):
             fontpath = [fontpath]
 
         if fontpath:
