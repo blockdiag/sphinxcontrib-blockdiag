@@ -37,7 +37,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'subdir' / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><img .*? src="\.\./_images/.*?.png" .*?/></div>')
+        self.assertRegexpMatches(source, r'<div><img .*? src="../_images/.*?.png" .*?/></div>')
 
     @with_png_app
     def test_width_option_on_png(self, app, status, warning):
@@ -171,7 +171,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
         self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
-                                          '<map name="(map_\d+)">'
+                                          '<map name="(map_\\d+)">'
                                           '<area shape="rect" coords="32.0,20.0,96.0,40.0" '
                                           'href="http://blockdiag.com/"></map>'
                                           '<img .*? src="\\1" usemap="#\\2" .*?/></a></div>'))
@@ -191,7 +191,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><map name="(map_\d+)">'
+        self.assertRegexpMatches(source, ('<div><map name="(map_\\d+)">'
                                           '<area shape="rect" coords="64.0,40.0,192.0,80.0" href="#target"></map>'
                                           '<img .*? src=".*?.png" usemap="#\\1" .*?/></div>'))
 
@@ -210,7 +210,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><map name="(map_\d+)">'
+        self.assertRegexpMatches(source, ('<div><map name="(map_\\d+)">'
                                           '<area shape="rect" coords="64.0,40.0,192.0,80.0" href="#hello-world">'
                                           '</map><img .*? src=".*?.png" usemap="#\\1" .*?/></div>'))
 
