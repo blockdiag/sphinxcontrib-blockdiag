@@ -20,17 +20,20 @@ import pkg_resources
 from collections import namedtuple
 from docutils import nodes
 from sphinx import addnodes
+from sphinx.util import logging
 from sphinx.util.osutil import ensuredir
 
 import blockdiag.utils.rst.nodes
 import blockdiag.utils.rst.directives
 from blockdiag.utils.bootstrap import detectfont, Application
-from blockdiag.utils.compat import u, string_types
+from blockdiag.utils.compat import string_types
 from blockdiag.utils.fontmap import FontMap
 from blockdiag.utils.rst.directives import with_blockdiag
 
 # fontconfig; it will be initialized on `builder-inited` event.
 fontmap = None
+
+logger = logging.getLogger(__name__)
 
 
 class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
@@ -56,11 +59,7 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
                        fontmap=builder.config.blockdiag_fontmap,
                        format=image_format,
                        transparency=builder.config.blockdiag_transparency)
-        if hasattr(builder, 'imgpath'):  # Sphinx (<= 1.2.x) or HTML writer
-            outputdir = builder.imgpath
-        else:
-            outputdir = ''
-        return posixpath.join(outputdir, self.get_path(**options))
+        return posixpath.join(builder.imgpath, self.get_path(**options))
 
     def get_abspath(self, image_format, builder):
         options = dict(antialias=builder.config.blockdiag_antialias,
@@ -69,13 +68,7 @@ class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
                        format=image_format,
                        transparency=builder.config.blockdiag_transparency)
 
-        if hasattr(builder, 'imagedir'):  # Sphinx (>= 1.3.x)
-            outputdir = os.path.join(builder.outdir, builder.imagedir)
-        elif hasattr(builder, 'imgpath'):  # Sphinx (<= 1.2.x) and HTML writer
-            outputdir = os.path.join(builder.outdir, '_images')
-        else:
-            outputdir = builder.outdir
-        path = os.path.join(outputdir, self.get_path(**options))
+        path = os.path.join(builder.outdir, builder.imagedir, self.get_path(**options))
         ensuredir(os.path.dirname(path))
 
         return path
@@ -92,7 +85,7 @@ def resolve_reference(builder, href):
     if href is None:
         return None
 
-    pattern = re.compile(u("^:ref:`(.+?)`"), re.UNICODE)
+    pattern = re.compile("^:ref:`(.+?)`", re.UNICODE)
     matched = pattern.search(href)
     if matched is None:
         return href
@@ -110,7 +103,7 @@ def resolve_reference(builder, href):
             else:
                 return xref['refuri']
         else:
-            builder.warn('undefined label: %s' % refid)
+            logger.warning('undefined label: %s', refid)
             return None
 
 
@@ -213,13 +206,13 @@ def html_visit_blockdiag(self, node):
 
         msg = ("blockdiag error: UnicodeEncodeError caught "
                "(check your font settings)")
-        self.builder.warn(msg)
+        logger.warning(msg)
         raise nodes.SkipNode
     except Exception as exc:
         if self.builder.config.blockdiag_debug:
             traceback.print_exc()
 
-        self.builder.warn('dot code %r: %s' % (node['code'], str(exc)))
+        logger.warning('dot code %r: %s', node['code'], exc)
         raise nodes.SkipNode
 
 
@@ -254,7 +247,7 @@ def get_image_format_for(builder):
 def on_builder_inited(self):
     # show deprecated message
     if self.builder.config.blockdiag_tex_image_format:
-        self.builder.warn('blockdiag_tex_image_format is deprecated. Use blockdiag_latex_image_format.')
+        logger.warning('blockdiag_tex_image_format is deprecated. Use blockdiag_latex_image_format.')
 
     # initialize fontmap
     global fontmap
@@ -262,7 +255,7 @@ def on_builder_inited(self):
     try:
         fontmappath = self.builder.config.blockdiag_fontmap
         fontmap = FontMap(fontmappath)
-    except:
+    except Exception:
         fontmap = FontMap(None)
 
     try:
@@ -274,7 +267,7 @@ def on_builder_inited(self):
             config = namedtuple('Config', 'font')(fontpath)
             fontpath = detectfont(config)
             fontmap.set_default_font(fontpath)
-    except:
+    except Exception:
         pass
 
 
@@ -288,7 +281,7 @@ def on_doctree_resolved(self, doctree, docname):
         if self.builder.config.blockdiag_debug:
             traceback.print_exc()
 
-        self.builder.warn('blockdiag error: %s' % exc)
+        logger.warning('blockdiag error: %s', exc)
         for node in doctree.traverse(blockdiag_node):
             node.parent.remove(node)
 
@@ -309,7 +302,7 @@ def on_doctree_resolved(self, doctree, docname):
             if self.builder.config.blockdiag_debug:
                 traceback.print_exc()
 
-            self.builder.warn('dot code %r: %s' % (node['code'], str(exc)))
+            logger.warning('dot code %r: %s', node['code'], exc)
             node.parent.remove(node)
 
 
