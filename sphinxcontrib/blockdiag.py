@@ -33,7 +33,35 @@ from blockdiag.utils.rst.directives import with_blockdiag
 fontmap = None
 
 
-class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag):
+class blockdiag_node(blockdiag.utils.rst.nodes.blockdiag, addnodes.translatable):
+    translated_messages = {}
+
+    def preserve_original_messages(self):
+        pass
+
+    def apply_translated_message(self, original_message, translated_message):
+        self.translated_messages[original_message] = translated_message
+
+    def extract_original_messages(self):
+        diagram = super(blockdiag_node, self).to_diagram()
+        labels = set([node.label for node in diagram.traverse_nodes()] +
+                     [edge.label for edge in diagram.traverse_edges()] +
+                     [group.label for group in diagram.traverse_groups()])
+        return list(filter(None, labels))
+
+    def to_diagram(self):
+        diagram = super(blockdiag_node, self).to_diagram()
+        for node in diagram.traverse_nodes():
+            if node.label in self.translated_messages:
+                node.label = self.translated_messages[node.label]
+        for edge in diagram.traverse_edges():
+            if edge.label in self.translated_messages:
+                edge.label = self.translated_messages[edge.label]
+        for group in diagram.traverse_groups():
+            if group.label in self.translated_messages:
+                group.label = self.translated_messages[group.label]
+        return diagram
+
     def to_drawer(self, image_format, builder, **kwargs):
         if 'filename' in kwargs:
             filename = kwargs.pop('filename')
@@ -278,6 +306,23 @@ def on_builder_inited(self):
         pass
 
 
+class blockdiag_image_node(nodes.image, addnodes.translatable):
+    original_messages = {}
+    translated_messages = {}
+
+    def preserve_original_messages(self):
+        pass
+
+    def apply_translated_message(self, original_message, translated_message):
+        self.translated_messages[original_message] = translated_message
+
+    def extract_original_messages(self):
+        return self.original_messages
+
+    def set_original_messages(self, original_message):
+        self.original_messages = original_message
+
+
 def on_doctree_resolved(self, doctree, docname):
     if self.builder.format in ('html', 'slides'):
         return
@@ -303,8 +348,12 @@ def on_doctree_resolved(self, doctree, docname):
                     image.draw()
                     image.save()
 
-                image = nodes.image(uri=relfn, candidates={'*': relfn}, **node['options'])
-                node.parent.replace(node, image)
+                image_node = blockdiag_image_node(uri=relfn, candidates={'*': relfn}, **node['options'])
+                image_node.set_original_messages(node.extract_original_messages())
+                image_node.uid = node.uid
+                image_node.source = node.source
+                image_node.line = node.line
+                node.parent.replace(node, image_node)
         except Exception as exc:
             if self.builder.config.blockdiag_debug:
                 traceback.print_exc()
