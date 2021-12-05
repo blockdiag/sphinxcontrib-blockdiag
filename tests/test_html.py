@@ -26,7 +26,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><img .*? src="_images/.*?.png" .*?/></div>')
+        self.assertRegexpMatches(source, '<div class="align-default"><img .*? src="_images/.*?.png" .*?/></div>')
 
     @with_app(srcdir='tests/docs/subdir', buildername='html', write_docstring=True)
     def test_build_png_image_in_subdir(self, app, status, warning):
@@ -37,7 +37,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'subdir' / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, r'<div><img .*? src="../_images/.*?.png" .*?/></div>')
+        self.assertRegexpMatches(source, r'<div class="align-default"><img .*? src="../_images/.*?.png" .*?/></div>')
 
     @with_png_app
     def test_width_option_on_png(self, app, status, warning):
@@ -49,7 +49,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<a class="reference internal image-reference" href="(.*?.png)">'
                                           '<img height="60.0" src="\\1" width="224.0" /></a></div>'))
 
     @with_png_app
@@ -62,7 +63,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<a class="reference internal image-reference" href="(.*?.png)">'
                                           '<img height="240.0" src="\\1" width="896.0" /></a></div>'))
 
     @with_png_app
@@ -76,7 +78,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text()
-        self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<a class="reference internal image-reference" href="(.*?.png)">'
                                           '<img height="200.0" src="\\1" width="100.0" /></a></div>'))
 
     @with_png_app
@@ -89,7 +92,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<a class="reference internal image-reference" href="(.*?.png)">'
                                           '<img height="30.0" src="\\1" width="112.0" /></a></div>'))
 
     @with_png_app
@@ -103,7 +107,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<a class="reference internal image-reference" href="(.*?.png)">'
                                           '<img height="1.875" src="\\1" width="7.0" /></a></div>'))
 
     @with_png_app
@@ -116,7 +121,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div align="center" class="align-center"><img .*? /></div>')
+        self.assertRegexpMatches(source, '<div class="align-center"><img .*? /></div>')
 
     @with_png_app
     def test_align_option_and_width_option_on_png(self, app, status, warning):
@@ -129,7 +134,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div align="center" class="align-center">'
+        self.assertRegexpMatches(source, ('<div class="align-center">'
                                           '<a class="reference internal image-reference" href="(.*?.png)">'
                                           '<img height="60.0" src="\\1" width="224.0" /></a></div>'))
 
@@ -143,7 +148,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><img .*? id="target" src=".*?" .*? /></div>')
+        self.assertRegexpMatches(source, '<div class="align-default"><img .*? id="target" src=".*?" .*? /></div>')
 
     @with_png_app
     def test_name_option_and_width_option_on_png(self, app, status, warning):
@@ -156,7 +161,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<a class="reference internal image-reference" href="(.*?.png)">'
                                           '<img height="60.0" id="target" src="\\1" width="224.0" /></a></div>'))
 
     @with_png_app
@@ -170,7 +176,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><a class="reference internal image-reference" href="(.*?.png)">'
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<a class="reference internal image-reference" href="(.*?.png)">'
                                           '<map name="(map_\\d+)">'
                                           '<area shape="rect" coords="32.0,20.0,96.0,40.0" '
                                           'href="http://blockdiag.com/"></map>'
@@ -191,7 +198,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><map name="(map_\\d+)">'
+        self.assertRegexpMatches(source, ('<div class="align-default"><map name="(map_\\d+)">'
                                           '<area shape="rect" coords="64.0,40.0,192.0,80.0" href="#target"></map>'
                                           '<img .*? src=".*?.png" usemap="#\\1" .*?/></div>'))
 
@@ -210,7 +217,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><map name="(map_\\d+)">'
+        self.assertRegexpMatches(source, ('<div class="align-default"><map name="(map_\\d+)">'
                                           '<area shape="rect" coords="64.0,40.0,192.0,80.0" href="#hello-world">'
                                           '</map><img .*? src=".*?.png" usemap="#\\1" .*?/></div>'))
 
@@ -224,7 +231,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, ('<div><img .*? src=".*?.png" .*?/></div>'))
+        self.assertRegexpMatches(source, ('<div class="align-default"><img .*? src=".*?.png" .*?/></div>'))
         self.assertIn('undefined label: unknown_target', warning.getvalue())
 
     @with_app(srcdir='tests/docs/basic', copy_srcdir_to_tmpdir=True,
@@ -237,7 +244,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><svg .*?>')
+        self.assertRegexpMatches(source, '<div class="align-default"><svg .*?>')
 
     @with_svg_app
     def test_width_option_on_svg(self, app, status, warning):
@@ -249,7 +256,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><svg height="60.0" viewBox="0 0 448 120" width="224.0" .*?>')
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<svg height="60.0" viewBox="0 0 448 120" width="224.0" .*?>'))
 
     @with_svg_app
     def test_height_option_on_svg(self, app, status, warning):
@@ -261,7 +269,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><svg height="240.0" viewBox="0 0 448 120" width="896.0" .*?>')
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<svg height="240.0" viewBox="0 0 448 120" width="896.0" .*?>'))
 
     @with_svg_app
     def test_width_option_and_height_option_on_svg(self, app, status, warning):
@@ -274,7 +283,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><svg height="200.0" viewBox="0 0 448 120" width="100.0" .*?>')
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<svg height="200.0" viewBox="0 0 448 120" width="100.0" .*?>'))
 
     @with_svg_app
     def test_scale_option_on_svg(self, app, status, warning):
@@ -286,7 +296,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><svg height="30.0" viewBox="0 0 448 120" width="112.0" .*?>')
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<svg height="30.0" viewBox="0 0 448 120" width="112.0" .*?>'))
 
     @with_svg_app
     def test_width_option_and_scale_option_on_svg(self, app, status, warning):
@@ -299,7 +310,8 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><svg height="1.875" viewBox="0 0 448 120" width="7.0" .*?>')
+        self.assertRegexpMatches(source, ('<div class="align-default">'
+                                          '<svg height="1.875" viewBox="0 0 448 120" width="7.0" .*?>'))
 
     @with_svg_app
     def test_align_option_on_svg(self, app, status, warning):
@@ -311,7 +323,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div align="center" class="align-center"><svg .*?>')
+        self.assertRegexpMatches(source, '<div class="align-center"><svg .*?>')
 
     @with_svg_app
     def test_name_option_on_svg(self, app, status, warning):
@@ -323,7 +335,7 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         """
         app.builder.build_all()
         source = (app.outdir / 'index.html').read_text(encoding='utf-8')
-        self.assertRegexpMatches(source, '<div><span id="target"></span><svg .*?>')
+        self.assertRegexpMatches(source, '<div class="align-default"><span id="target"></span><svg .*?>')
 
     @with_svg_app
     def test_reftarget_in_href_on_svg1(self, app, status, warning):
