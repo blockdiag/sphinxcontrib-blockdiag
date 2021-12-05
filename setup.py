@@ -6,7 +6,7 @@ requires = ['blockdiag>=1.5.0', 'Sphinx>=2.0']
 
 setup(
     name='sphinxcontrib-blockdiag',
-    version='2.0.0',
+    version='3.0.0',
     url='https://github.com/blockdiag/sphinxcontrib-blockdiag',
     license='BSD',
     author='Takeshi KOMIYA',
