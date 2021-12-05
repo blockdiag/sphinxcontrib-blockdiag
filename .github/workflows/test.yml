@@ -1,0 +1,40 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [py35, py36, py37, py38, blockdiag_dev]
+        include:
+        - name: py35
+          python: 3.5
+          toxenv: py35
+        - name: py36
+          python: 3.6
+          toxenv: py36
+        - name: py37
+          python: 3.7
+          toxenv: py37
+        - name: py38
+          python: 3.8
+          toxenv: py38
+        - name: blockdiag_dev
+          python: 3.8
+          toxenv: blockdiag_dev
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Check Python version
+      run: python --version
+    - name: Install dependencies
+      run: pip install -U tox
+    - name: Run Tox
+      run: tox -e ${{ matrix.toxenv }} -- -vv

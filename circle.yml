@@ -1,8 +1,0 @@
-dependencies:
-  override:
-    - pip install docutils tox
-  cache_directories:
-    - "~/.cache/pip"
-test:
-  override:
-    - tox -e blockdiag_dev
