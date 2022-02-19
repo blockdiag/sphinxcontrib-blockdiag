@@ -228,8 +228,32 @@ class TestSphinxcontribBlockdiagHTML(unittest.TestCase):
         self.assertIn('undefined label: unknown_target', warning.getvalue())
 
     @with_app(srcdir='tests/docs/basic', copy_srcdir_to_tmpdir=True,
-              write_docstring=True, confoverrides={'blockdiag_html_image_format': 'SVG'})
+              write_docstring=True, confoverrides={'blockdiag_image_format': {'html': 'SVG'}})
     def test_build_svg_image(self, app, status, warning):
+        """
+        .. blockdiag::
+
+           A -> B;
+        """
+        app.builder.build_all()
+        source = (app.outdir / 'index.html').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '<div><svg .*?>')
+
+    @with_app(srcdir='tests/docs/basic', copy_srcdir_to_tmpdir=True,
+              write_docstring=True, confoverrides={'blockdiag_image_format': {'*': 'SVG'}})
+    def test_build_svg_image_fallback(self, app, status, warning):
+        """
+        .. blockdiag::
+
+           A -> B;
+        """
+        app.builder.build_all()
+        source = (app.outdir / 'index.html').read_text(encoding='utf-8')
+        self.assertRegexpMatches(source, '<div><svg .*?>')
+
+    @with_app(srcdir='tests/docs/basic', copy_srcdir_to_tmpdir=True,
+              write_docstring=True, confoverrides={'blockdiag_html_image_format': 'SVG'})
+    def test_build_svg_image_deprecated(self, app, status, warning):
         """
         .. blockdiag::
 
