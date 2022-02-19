@@ -18,8 +18,13 @@ class TestSphinxcontribBlockdiagErrors(unittest.TestCase):
         app.builder.build_all()
         self.assertIn('got unexpected token:', warning.getvalue())
 
-    @with_app(srcdir='tests/docs/basic', confoverrides=dict(blockdiag_html_image_format='JPG'))
+    @with_app(srcdir='tests/docs/basic', confoverrides=dict(blockdiag_image_format={'html': 'JPG'}))
     def test_unknown_format_error(self, app, status, warning):
+        app.builder.build_all()
+        self.assertIn('unknown format: JPG', warning.getvalue())
+
+    @with_app(srcdir='tests/docs/basic', confoverrides=dict(blockdiag_html_image_format='JPG'))
+    def test_unknown_format_error_deprecated(self, app, status, warning):
         app.builder.build_all()
         self.assertIn('unknown format: JPG', warning.getvalue())
 

@@ -212,20 +212,23 @@ def html_depart_blockdiag(self, node):
 
 
 def get_image_format_for(builder):
-    if builder.format in ('html', 'slides'):
-        image_format = builder.config.blockdiag_html_image_format.upper()
-    elif builder.format == 'latex':
-        if builder.config.blockdiag_tex_image_format:
-            image_format = builder.config.blockdiag_tex_image_format.upper()
-        else:
-            image_format = builder.config.blockdiag_latex_image_format.upper()
-    else:
-        image_format = 'PNG'
+    config = builder.config
+    image_format = config.blockdiag_image_format.get(builder.format)
 
-    if image_format.upper() not in ('PNG', 'PDF', 'SVG'):
+    # If an explicit image format is not set, check if the wildcard
+    # entry defines a format.
+    if not image_format:
+        image_format = config.blockdiag_image_format.get('*')
+
+    if not image_format:
+        image_format = 'PNG'  # default image format
+    else:
+        image_format = image_format.upper()
+
+    if image_format not in ('PNG', 'PDF', 'SVG'):
         raise ValueError('unknown format: %s' % image_format)
 
-    if image_format.upper() == 'PDF':
+    if image_format == 'PDF':
         try:
             import reportlab  # NOQA: importing test
         except ImportError:
@@ -296,6 +299,19 @@ def on_doctree_resolved(self, doctree, docname):
             node.parent.remove(node)
 
 
+def default_blockdiag_image_format(config):
+    if config.blockdiag_latex_image_format:
+        latex_image_format = config.blockdiag_latex_image_format
+    else:
+        latex_image_format = config.blockdiag_tex_image_format
+
+    return {
+        'html': config.blockdiag_html_image_format,
+        'slides': config.blockdiag_html_image_format,
+        'latex': latex_image_format,
+    }
+
+
 def setup(app):
     app.add_node(blockdiag_node,
                  html=(html_visit_blockdiag, html_depart_blockdiag))
@@ -305,9 +321,13 @@ def setup(app):
     app.add_config_value('blockdiag_antialias', False, 'html')
     app.add_config_value('blockdiag_transparency', True, 'html')
     app.add_config_value('blockdiag_debug', False, 'html')
-    app.add_config_value('blockdiag_html_image_format', 'PNG', 'html')
-    app.add_config_value('blockdiag_tex_image_format', None, 'html')  # backward compatibility for 1.3.1
-    app.add_config_value('blockdiag_latex_image_format', 'PNG', 'html')
+    app.add_config_value('blockdiag_image_format', default_blockdiag_image_format, 'env')
+
+    # deprecated options
+    app.add_config_value('blockdiag_html_image_format', None, 'html')
+    app.add_config_value('blockdiag_latex_image_format', None, 'latex')
+    app.add_config_value('blockdiag_tex_image_format', None, 'latex')
+
     app.connect("builder-inited", on_builder_inited)
     app.connect("doctree-resolved", on_doctree_resolved)
 
