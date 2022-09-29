@@ -1,9 +1,6 @@
-Welcome to test's documentation!
-================================
 
 .. blockdiag::
 
-   {
-     A -> B;
-   }
-
+   A -> B;
+   A [href = ':ref:`target`'];
+    
